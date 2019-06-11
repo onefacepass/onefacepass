@@ -38,6 +38,11 @@ void Camera::start()
     this->camera->start();
 }
 
+void Camera::stop()
+{
+    this->camera->stop();
+}
+
 void Camera::setViewFinder(QCameraViewfinder* viewfinder)
 {
     this->camera->setViewfinder(viewfinder);

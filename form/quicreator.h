@@ -34,11 +34,10 @@ private slots:
     void initForm();
     void initCamera();
     void initHistoryWidget();
-    void initPanelWidget();
     void initNav();
     void initOther();
 
-
+    void startAndStopCamera();
     void setStyle(const QString &str);
 
 private:
@@ -46,14 +45,6 @@ private:
     void debugFunc();           // TODO
 
 private slots:
-    void on_btnInfo_clicked();
-    void on_btnQuestion_clicked();
-    void on_btnError_clicked();
-    void on_btnInput_clicked();
-    void on_btnInputPwd_clicked();
-    void on_btnInputcbox_clicked();
-    void on_btnWidget_clicked();
-
     void setCamera(const QCameraInfo &cameraInfo);
     void updateCamera(QAction *action);
     void displayCameraError();

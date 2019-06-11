@@ -18,16 +18,11 @@ int main(int argc, char *argv[])
     QUIWidget::setTranslator(":/image/widgets.qm");
     AppInit::Instance()->start();
 
-    //读取配置文件
-    //QUIConfig::ConfigFile = QString("%1/%2").arg(QUIWidget::appPath()).arg("qui_config.ini");
-    //QUIConfig::ReadConfig();
-
     QUIWidget qui;
     QUICreator *creator = new QUICreator;
 
     //设置主窗体
     qui.setMainWidget(creator);
-//    QObject::connect(&qui, SIGNAL(changeStyle(QString)), creator, SLOT(changeStyle(QString)));
 
     //设置标题
     qui.setTitle("一脸通 演示版");
@@ -41,11 +36,6 @@ int main(int argc, char *argv[])
     //设置换肤下拉菜单可见
     qui.setVisible(QUIWidget::BtnMenu, true);
 
-    //设置标题栏高度
-//    qui.setTitleHeight(50);
-
-    //设置按钮宽度
-    //qui.setBtnWidth(50);
 
     //设置左上角图标-图形字体
 //    qui.setIconMain(QChar(0xf099), 11);

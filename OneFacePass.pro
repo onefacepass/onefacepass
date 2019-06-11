@@ -24,31 +24,22 @@ INCLUDEPATH     += $$PWD/demo
 CONFIG          += qt warn_off
 #DEFINES         += DEBUG
 
-SOURCES += main.cpp\    
+SOURCES += main.cpp\     \
     form/quiwidget.cpp \
     form/quicreator.cpp \
-    form/panelwidget.cpp \
-    form/frmdevice.cpp \
     demo/appinit.cpp    \
-#    demo/sliderbar.cpp \
-#    demo/navlistview.cpp \
     form/camera.cpp
 
 
 HEADERS  += head.h\
     form/quiwidget.h \
     form/quicreator.h \
-    form/panelwidget.h \
-    form/frmdevice.h \
     demo/appinit.h  \
-#    demo/sliderbar.h \
-#    demo/navlistview.h \
     form/camera.h
 
 
 FORMS    += \
-    form/quicreator.ui \
-    form/frmdevice.ui
+    form/quicreator.ui
 
 
 RESOURCES += \
