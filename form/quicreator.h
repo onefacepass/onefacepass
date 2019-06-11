@@ -64,7 +64,6 @@ private slots:
 
 private slots:
     void initStyle();
-    void on_tabWidget_currentChanged(int index);
 };
 
 #endif // QUICREATOR_H
