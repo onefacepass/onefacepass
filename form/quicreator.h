@@ -34,11 +34,10 @@ private slots:
     void initForm();
     void initCamera();
     void initHistoryWidget();
-    void initPanelWidget();
     void initNav();
     void initOther();
 
-
+    void startAndStopCamera();
     void setStyle(const QString &str);
 
 private:

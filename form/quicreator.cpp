@@ -2,7 +2,6 @@
 #include "ui_quicreator.h"
 
 #include "quiwidget.h"
-#include "frmdevice.h"
 
 Q_DECLARE_METATYPE(QCameraInfo)
 
@@ -54,11 +53,22 @@ void QUICreator::initCamera()
     }
 
     connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
+    connect(ui->checkbox_camera, &QCheckBox::stateChanged, this, &QUICreator::startAndStopCamera);
 //    connect(ui->captureWidget, &QTabWidget::currentChanged, this, &Camera::updateCaptureMode);
 
     setCamera(this->camera->get_default_camera());
+    ui->checkbox_camera->setChecked(true);
 }
 
+
+void QUICreator::startAndStopCamera()
+{
+    if (ui->checkbox_camera->isChecked()) {
+        camera->start();
+    } else {
+        camera->stop();
+    }
+}
 
 // 切换摄像头
 void QUICreator::updateCamera(QAction *action)
@@ -138,25 +148,6 @@ void QUICreator::initNav()
     ui->btn_menu_debug->click();
 }
 
-void QUICreator::initPanelWidget()
-{
-    //加载已注册信息
-    qDeleteAll(frms);
-    frms.clear();
-
-    for (int i = 0; i < 50; i++) {
-        frmDevice *frm = new frmDevice;
-        frm->setFixedHeight(100);
-        frm->setDeviceName(QString("这里是学号 %1").arg(i + 1));
-        frm->setDeviceTemp(25.8);
-        frms.append(frm);
-    }
-
-    ui->widgetPanel->setWidget(frms, 7);
-    ui->widgetPanel->setMargin(3);
-    ui->widgetPanel->setSpacing(3);
-}
-
 void QUICreator::initOther()
 {
     ui->rbtn1->setChecked(true);
@@ -177,7 +168,7 @@ void QUICreator::initOther()
     connect(ui->btn_ready_pay, &QPushButton::clicked, this, &QUICreator::btnReadyPayClicked);
     connect(ui->btn_reset_pay, &QPushButton::clicked, this, &QUICreator::resetConsumption);
 
-
+//    ui->btn_pay->setFixedHeight(70);
 //    ui->widget_video->setStyleSheet("border: 1px solid #00bb9e;");
     debugFunc();
 }
@@ -308,9 +299,6 @@ void QUICreator::setStyle(const QString &str)
     QString paletteColor = str.mid(20, 7);
     qApp->setPalette(QPalette(QColor(paletteColor)));
     qApp->setStyleSheet(str);
-    ui->widgetPanel->setStyleSheet(QString("QFrame#boxPanel{border-width:0px;background:%1;}"
-                                           "QFrame#gboxDevicePanel,QFrame#gboxDeviceTitle{padding:3px;}")
-                                   .arg(paletteColor));
 }
 
 void QUICreator::debugFunc()
@@ -354,6 +342,7 @@ void QUICreator::resetConsumption()
 void QUICreator::btnReadyPayClicked()
 {
     ui->btn_pay->setEnabled(true);
+    ui->btn_pay->setFocus();
 }
 
 

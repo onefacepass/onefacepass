@@ -21,6 +21,7 @@ public:
     void set_current_camera(const QCameraInfo &camera);
     QCamera* get_current_camera();
     void start();
+    void stop();
     void setViewFinder(QCameraViewfinder* viewfinder);
 
 public slots:
