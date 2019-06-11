@@ -27,9 +27,8 @@ void QUICreator::initForm()
     initOther();
 
     initStyle();
-    QTimer::singleShot(100, this, SLOT(initPanelWidget()));
 
-    ui->tabWidget->setCurrentIndex(7);
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 // 加载摄像头
@@ -142,7 +141,6 @@ void QUICreator::initNav()
 
     foreach (QPushButton *btn, btns) {
         btn->setCheckable(true);
-//        connect(btn, SIGNAL(clicked(bool)), this, SLOT(navBtnClicked()));
         connect(btn, &QPushButton::clicked, this, &QUICreator::navBtnClicked);
     }
     ui->btn_menu_debug->click();
@@ -168,8 +166,6 @@ void QUICreator::initOther()
     connect(ui->btn_ready_pay, &QPushButton::clicked, this, &QUICreator::btnReadyPayClicked);
     connect(ui->btn_reset_pay, &QPushButton::clicked, this, &QUICreator::resetConsumption);
 
-//    ui->btn_pay->setFixedHeight(70);
-//    ui->widget_video->setStyleSheet("border: 1px solid #00bb9e;");
     debugFunc();
 }
 
@@ -195,78 +191,6 @@ void QUICreator::navBtnClicked()
     }
 
 }
-
-void QUICreator::on_btnInfo_clicked()
-{
-    QUIWidget::showMessageBoxInfo("恭喜你,中了500万大奖!请到飞扬青云处领取大奖!");
-}
-
-void QUICreator::on_btnQuestion_clicked()
-{
-    QUIWidget::showMessageBoxQuestion("确定不要当前的500万大奖吗?");
-}
-
-void QUICreator::on_btnError_clicked()
-{
-    QUIWidget::showMessageBoxError("领取500万大奖发生错误,请重试!");
-}
-
-void QUICreator::on_btnInput_clicked()
-{
-    bool ok;
-    QString txt = QUIWidget::showInputBox(ok, "请输入姓名:");
-
-    if (ok) {
-        QUIWidget::showMessageBoxInfo(QString("您输入的姓名是 : %1").arg(txt));
-    }
-}
-
-void QUICreator::on_btnInputPwd_clicked()
-{
-    bool ok;
-    QString txt = QUIWidget::showInputBox(ok, "请输入领取500万大奖密码:", 0, 0, "领取500万大奖密码", true);
-
-    if (ok) {
-        QUIWidget::showMessageBoxInfo(QString("您输入的密码是 : %1").arg(txt));
-    }
-}
-
-void QUICreator::on_btnInputcbox_clicked()
-{
-    bool ok;
-    QStringList defaultValue;
-
-    for (int i = 1; i <= 50; i++) {
-        defaultValue.append(QString::number(i));
-    }
-
-    QString txt = QUIWidget::showInputBox(ok, "请选择学号:", 1, 0, defaultValue.join("|"));
-
-    if (ok) {
-        QUIWidget::showMessageBoxInfo(QString("您选择的学号是 : %1").arg(txt));
-    }
-}
-
-void QUICreator::on_btnWidget_clicked()
-{
-    //两种方式弹出都可以
-#if 0
-    QUIWidget *qui = new QUIWidget;
-    qui->setTitle("新窗体测试");
-    qui->setAlignment(Qt::AlignCenter);
-    qui->setMainWidget(new QWidget);
-    qui->show();
-#else
-    QUIWidget qui;
-    qui.setTitle("新窗体测试");
-    qui.setAlignment(Qt::AlignCenter);
-    qui.setMainWidget(new QWidget);
-    qui.setOnlyCloseBtn();
-    qui.exec();
-#endif
-}
-
-
 
 
 void QUICreator::initStyle()
@@ -347,7 +271,6 @@ void QUICreator::btnReadyPayClicked()
 
 
 /* @func: 触发支付按钮后的动作放这里
- *
  */
 void QUICreator::btnPayClicked()
 {

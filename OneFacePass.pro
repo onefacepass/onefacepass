@@ -27,7 +27,6 @@ CONFIG          += qt warn_off
 SOURCES += main.cpp\     \
     form/quiwidget.cpp \
     form/quicreator.cpp \
-    form/panelwidget.cpp \
     demo/appinit.cpp    \
     form/camera.cpp
 
@@ -35,7 +34,6 @@ SOURCES += main.cpp\     \
 HEADERS  += head.h\
     form/quiwidget.h \
     form/quicreator.h \
-    form/panelwidget.h \
     demo/appinit.h  \
     form/camera.h
 

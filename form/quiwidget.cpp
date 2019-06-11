@@ -61,24 +61,16 @@ void QUIWidget::setStyle(QUIWidget::Style style)
 {
     QString qssFile = ":/qss/blue.css";
 
-    if (style == QUIWidget::Style_Silvery) {
-        qssFile = ":/qss/silvery.css";
-    } else if (style == QUIWidget::Style_Blue) {
+    if (style == QUIWidget::Style_Blue) {
         qssFile = ":/qss/blue.css";
     } else if (style == QUIWidget::Style_LightBlue) {
         qssFile = ":/qss/lightblue.css";
     } else if (style == QUIWidget::Style_DarkBlue) {
         qssFile = ":/qss/darkblue.css";
-    } else if (style == QUIWidget::Style_Gray) {
-        qssFile = ":/qss/gray.css";
-    } else if (style == QUIWidget::Style_LightGray) {
-        qssFile = ":/qss/lightgray.css";
     } else if (style == QUIWidget::Style_DarkGray) {
         qssFile = ":/qss/darkgray.css";
     } else if (style == QUIWidget::Style_Black) {
         qssFile = ":/qss/black.css";
-    } else if (style == QUIWidget::Style_LightBlack) {
-        qssFile = ":/qss/lightblack.css";
     } else if (style == QUIWidget::Style_DarkBlack) {
         qssFile = ":/qss/darkblack.css";
     } else if (style == QUIWidget::Style_PSBlack) {
@@ -239,7 +231,7 @@ void QUIWidget::sleep(int sec)
 void QUIWidget::setSystemDateTime(const QString &year, const QString &month, const QString &day, const QString &hour, const QString &min, const QString &sec)
 {
 #ifdef Q_OS_WIN
-    QProcess p(0);
+    QProcess p(nullptr);
     p.start("cmd");
     p.waitForStarted();
     p.write(QString("date %1-%2-%3\n").arg(year).arg(month).arg(day).toLatin1());
@@ -1307,8 +1299,8 @@ void QUIWidget::initForm()
 
     //添加换肤菜单
     QStringList name;
-    name << "银色" << "蓝色" << "浅蓝色" << "深蓝色" << "灰色" << "浅灰色" << "深灰色" << "黑色"
-         << "浅黑色" << "深黑色" << "PS黑色" << "黑色扁平" << "白色扁平";
+    name << "蓝色" << "浅蓝色" << "深蓝色" <<  "深灰色" << "黑色"
+         << "深黑色" << "PS黑色" << "黑色扁平" << "白色扁平";
 
     foreach (QString str, name) {
         QAction *action = new QAction(str, this);
@@ -1323,10 +1315,7 @@ void QUIWidget::changeStyle()
     QString name = act->text();
     QString qssFile = ":/qss/blue.css";
 
-    if (name == "银色") {
-        qssFile = ":/qss/silvery.css";
-        setStyle(QUIWidget::Style_Silvery);
-    } else if (name == "蓝色") {
+    if (name == "蓝色") {
         qssFile = ":/qss/blue.css";
         setStyle(QUIWidget::Style_Blue);
     } else if (name == "浅蓝色") {
@@ -1335,21 +1324,12 @@ void QUIWidget::changeStyle()
     } else if (name == "深蓝色") {
         qssFile = ":/qss/darkblue.css";
         setStyle(QUIWidget::Style_DarkBlue);
-    } else if (name == "灰色") {
-        qssFile = ":/qss/gray.css";
-        setStyle(QUIWidget::Style_Gray);
-    } else if (name == "浅灰色") {
-        qssFile = ":/qss/lightgray.css";
-        setStyle(QUIWidget::Style_LightGray);
     } else if (name == "深灰色") {
         qssFile = ":/qss/darkgray.css";
         setStyle(QUIWidget::Style_DarkGray);
     } else if (name == "黑色") {
         qssFile = ":/qss/black.css";
         setStyle(QUIWidget::Style_Black);
-    } else if (name == "浅黑色") {
-        qssFile = ":/qss/lightblack.css";
-        setStyle(QUIWidget::Style_LightBlack);
     } else if (name == "深黑色") {
         qssFile = ":/qss/darkblack.css";
         setStyle(QUIWidget::Style_DarkBlack);
@@ -1479,7 +1459,7 @@ void QUIWidget::setMinHide(bool minHide)
 void QUIWidget::setMainWidget(QWidget *mainWidget)
 {
     //一个QUI窗体对象只能设置一个主窗体
-    if (this->mainWidget == 0) {
+    if (this->mainWidget == nullptr) {
         //将子窗体添加到布局
         this->widget->layout()->addWidget(mainWidget);
         //自动设置大小
@@ -2121,7 +2101,7 @@ void QUIInputBox::setIconMain(QChar str, quint32 size)
 }
 
 
-IconHelper *IconHelper::self = 0;
+IconHelper *IconHelper::self = nullptr;
 IconHelper::IconHelper(QObject *) : QObject(qApp)
 {
     int fontId = QFontDatabase::addApplicationFont(":/image/fontawesome-webfont.ttf");
