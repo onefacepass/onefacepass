@@ -28,7 +28,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
-        <widget class="QCameraViewfinder" name="viewfinder" native="true">
+        <widget class="CameraViewfinder" name="viewfinder" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -295,8 +295,14 @@
       <property name="enabled">
        <bool>true</bool>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>300</height>
+       </size>
+      </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_stu">
        <attribute name="title">
@@ -428,109 +434,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_other">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <attribute name="title">
-        <string>常用组件</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="title">
-           <string>分组框</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="1" column="2">
-            <widget class="QPushButton" name="btnError">
-             <property name="text">
-              <string>错误框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0" colspan="7">
-            <widget class="QPlainTextEdit" name="plainTextEdit">
-             <property name="plainText">
-              <string>调试日志
-调试日志
-调试日志
-调试日志
-调试日志
-调试日志
-调试日志
-调试日志
-调试日志</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QRadioButton" name="rbtn2">
-             <property name="text">
-              <string>单选框2</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
-            <widget class="QPushButton" name="btnInput">
-             <property name="text">
-              <string>标准输入框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="4">
-            <widget class="QPushButton" name="btnInputPwd">
-             <property name="text">
-              <string>密码输入框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QRadioButton" name="rbtn1">
-             <property name="text">
-              <string>单选框1</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="6">
-            <widget class="QPushButton" name="btnWidget">
-             <property name="text">
-              <string>新窗体</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="5">
-            <widget class="QPushButton" name="btnInputcbox">
-             <property name="text">
-              <string>下拉输入框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QPushButton" name="btnQuestion">
-             <property name="text">
-              <string>提示框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QPushButton" name="btnInfo">
-             <property name="text">
-              <string>信息框</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
      </widget>
     </item>
    </layout>
@@ -567,9 +470,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QCameraViewfinder</class>
+   <class>CameraViewfinder</class>
    <extends>QWidget</extends>
-   <header>qcameraviewfinder.h</header>
+   <header>cameraviewfinder.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

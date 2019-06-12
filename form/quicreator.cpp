@@ -148,8 +148,6 @@ void QUICreator::initNav()
 
 void QUICreator::initOther()
 {
-    ui->rbtn1->setChecked(true);
-
     ui->checkbox_face->setChecked(false);
     ui->checkbox_pose->setChecked(false);
     ui->checkbox_log->setChecked(false);

@@ -25,6 +25,7 @@ CONFIG          += qt warn_off
 #DEFINES         += DEBUG
 
 SOURCES += main.cpp\     \
+    form/cameraviewfinder.cpp \
     form/quiwidget.cpp \
     form/quicreator.cpp \
     demo/appinit.cpp    \
@@ -32,6 +33,7 @@ SOURCES += main.cpp\     \
 
 
 HEADERS  += head.h\
+    form/cameraviewfinder.h \
     form/quiwidget.h \
     form/quicreator.h \
     demo/appinit.h  \
