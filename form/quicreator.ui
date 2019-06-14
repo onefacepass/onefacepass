@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_7">
     <item row="0" column="4" rowspan="2">
-     <widget class="QWidget" name="widget_video" native="true">
+     <widget class="QWidget" name="widgetVideo" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -28,7 +28,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
-        <widget class="QCameraViewfinder" name="viewfinder" native="true">
+        <widget class="CameraViewfinder" name="viewfinder" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -44,7 +44,7 @@
      </widget>
     </item>
     <item row="0" column="2">
-     <widget class="QStackedWidget" name="stacked_widget_debug">
+     <widget class="QStackedWidget" name="stackedWidgetDebug">
       <property name="maximumSize">
        <size>
         <width>150</width>
@@ -54,19 +54,19 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="page_debug">
+      <widget class="QWidget" name="pageDebug">
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0">
-           <widget class="QPushButton" name="btn_camera_refresh">
+           <widget class="QPushButton" name="btnCameraRefresh">
             <property name="text">
              <string>重新识别</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QPushButton" name="btn_camera_cancel">
+           <widget class="QPushButton" name="btnCameraCancel">
             <property name="text">
              <string>取消</string>
             </property>
@@ -84,21 +84,21 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="2" column="0">
-            <widget class="QCheckBox" name="checkbox_log">
+            <widget class="QCheckBox" name="checkboxLog">
              <property name="text">
               <string>显示日志</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QCheckBox" name="checkbox_pose">
+            <widget class="QCheckBox" name="checkboxPose">
              <property name="text">
               <string>姿态轮廓</string>
              </property>
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QCheckBox" name="checkbox_face">
+            <widget class="QCheckBox" name="checkboxFace">
              <property name="text">
               <string>人脸轮廓</string>
              </property>
@@ -118,7 +118,7 @@
             </spacer>
            </item>
            <item row="3" column="0">
-            <widget class="QCheckBox" name="checkbox_camera">
+            <widget class="QCheckBox" name="checkboxCamera">
              <property name="text">
               <string>摄像头</string>
              </property>
@@ -132,7 +132,7 @@
       <widget class="QWidget" name="page_consumption">
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <widget class="QLabel" name="label_pay">
+         <widget class="QLabel" name="labelPay">
           <property name="styleSheet">
            <string notr="true">font: 25 11pt &quot;微软雅黑 Light&quot;;</string>
           </property>
@@ -148,7 +148,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="spinbox_pay">
+         <widget class="QDoubleSpinBox" name="spinboxPay">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -179,7 +179,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_ready_pay">
+         <widget class="QPushButton" name="btnReadyPay">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -198,7 +198,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_reset_pay">
+         <widget class="QPushButton" name="btnResetPay">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -234,7 +234,7 @@
      </widget>
     </item>
     <item row="0" column="1">
-     <widget class="QWidget" name="widget_vertical_menu" native="true">
+     <widget class="QWidget" name="widgetVerticalMenu" native="true">
       <property name="minimumSize">
        <size>
         <width>80</width>
@@ -258,7 +258,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QPushButton" name="btn_menu_debug">
+        <widget class="QPushButton" name="btnMenuDebug">
          <property name="text">
           <string>调试</string>
          </property>
@@ -268,7 +268,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_menu_work">
+        <widget class="QPushButton" name="btnMenuWork">
          <property name="text">
           <string>工作</string>
          </property>
@@ -295,10 +295,16 @@
       <property name="enabled">
        <bool>true</bool>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>300</height>
+       </size>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_stu">
+      <widget class="QWidget" name="tabStu">
        <attribute name="title">
         <string>学生界面</string>
        </attribute>
@@ -345,7 +351,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="btn_pay">
+            <widget class="QPushButton" name="btnPay">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -374,7 +380,7 @@
          </widget>
         </item>
         <item alignment="Qt::AlignHCenter">
-         <widget class="QToolButton" name="btn_cancel">
+         <widget class="QToolButton" name="btnCancel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -404,13 +410,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_log">
+      <widget class="QWidget" name="tabLog">
        <attribute name="title">
         <string>调试日志</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
-         <widget class="QPlainTextEdit" name="plaintext_log">
+         <widget class="QPlainTextEdit" name="plaintextLog">
           <property name="plainText">
            <string/>
           </property>
@@ -418,116 +424,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_history">
+      <widget class="QWidget" name="tabHistory">
        <attribute name="title">
         <string>历史记录</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QTableWidget" name="history_table_widget"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_other">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <attribute name="title">
-        <string>常用组件</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="title">
-           <string>分组框</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="1" column="2">
-            <widget class="QPushButton" name="btnError">
-             <property name="text">
-              <string>错误框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0" colspan="7">
-            <widget class="QPlainTextEdit" name="plainTextEdit">
-             <property name="plainText">
-              <string>调试日志
-调试日志
-调试日志
-调试日志
-调试日志
-调试日志
-调试日志
-调试日志
-调试日志</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QRadioButton" name="rbtn2">
-             <property name="text">
-              <string>单选框2</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
-            <widget class="QPushButton" name="btnInput">
-             <property name="text">
-              <string>标准输入框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="4">
-            <widget class="QPushButton" name="btnInputPwd">
-             <property name="text">
-              <string>密码输入框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QRadioButton" name="rbtn1">
-             <property name="text">
-              <string>单选框1</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="6">
-            <widget class="QPushButton" name="btnWidget">
-             <property name="text">
-              <string>新窗体</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="5">
-            <widget class="QPushButton" name="btnInputcbox">
-             <property name="text">
-              <string>下拉输入框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QPushButton" name="btnQuestion">
-             <property name="text">
-              <string>提示框</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QPushButton" name="btnInfo">
-             <property name="text">
-              <string>信息框</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+         <widget class="QTableWidget" name="historyTableWidget"/>
         </item>
        </layout>
       </widget>
@@ -544,32 +447,31 @@
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_F">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>文件(&amp;F)</string>
     </property>
-    <addaction name="separator"/>
    </widget>
-   <widget class="QMenu" name="menu_device">
+   <widget class="QMenu" name="menuDevice">
     <property name="title">
      <string>设备</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menu_H">
+   <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>帮助(&amp;H)</string>
     </property>
    </widget>
-   <addaction name="menu_F"/>
-   <addaction name="menu_device"/>
-   <addaction name="menu_H"/>
+   <addaction name="menuFile"/>
+   <addaction name="menuDevice"/>
+   <addaction name="menuHelp"/>
   </widget>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QCameraViewfinder</class>
+   <class>CameraViewfinder</class>
    <extends>QWidget</extends>
-   <header>qcameraviewfinder.h</header>
+   <header>cameraviewfinder.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

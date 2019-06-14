@@ -24,10 +24,11 @@ private:
     Ui::QUICreator *ui;
 
     Camera* camera;
-    QList<QWidget *> frms;      // TODO: 已注册学生信息的展示面板
 
-    QString currentFile;        //当前QSS文件
-    QString currentQSS;         //当前QSS文本
+private:
+    void insertLog(const QString& log);
+    void displayLogOnCamera(const QString& log);
+    void debugFunc();           // TODO
 
 
 private slots:
@@ -40,12 +41,7 @@ private slots:
     void startAndStopCamera();
     void setStyle(const QString &str);
 
-private:
-    void insertAnLog(const QString& log);
-    void debugFunc();           // TODO
-
-private slots:
-    void setCamera(const QCameraInfo &cameraInfo);
+    void setCamera(const QCameraInfo &camera_info);
     void updateCamera(QAction *action);
     void displayCameraError();
     void resetConsumption();
@@ -53,7 +49,6 @@ private slots:
     void btnReadyPayClicked();
     void navBtnClicked();
 
-private slots:
     void initStyle();
 };
 
