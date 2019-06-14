@@ -13,13 +13,16 @@ class CameraViewfinder : public QCameraViewfinder
 private:
     QQueue<QString> q_log;
 
-
+protected:
+    void paintEvent(QPaintEvent *e);
 
 public:
     CameraViewfinder(QWidget *parent = nullptr);
+    ~CameraViewfinder();
+
     void insertLog(const QString& log);
 
-    void paintEvent(QPaintEvent *e);
+
 };
 
 #endif // CAMERAVIEWFINDER_H

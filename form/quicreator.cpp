@@ -48,21 +48,21 @@ void QUICreator::initCamera()
         if (cameraInfo == QCameraInfo::defaultCamera())
             videoDeviceAction->setChecked(true);
 
-        ui->menu_device->addAction(videoDeviceAction);
+        ui->menuDevice->addAction(videoDeviceAction);
     }
 
     connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
-    connect(ui->checkbox_camera, &QCheckBox::stateChanged, this, &QUICreator::startAndStopCamera);
+    connect(ui->checkboxCamera, &QCheckBox::stateChanged, this, &QUICreator::startAndStopCamera);
 //    connect(ui->captureWidget, &QTabWidget::currentChanged, this, &Camera::updateCaptureMode);
 
     setCamera(this->camera->get_default_camera());
-    ui->checkbox_camera->setChecked(true);
+    ui->checkboxCamera->setChecked(true);
 }
 
 
 void QUICreator::startAndStopCamera()
 {
-    if (ui->checkbox_camera->isChecked()) {
+    if (ui->checkboxCamera->isChecked()) {
         camera->start();
     } else {
         camera->stop();
@@ -96,29 +96,29 @@ void QUICreator::initHistoryWidget()
 {
     //设置列数和列宽
     int width = qApp->desktop()->availableGeometry().width() - 120;
-    ui->history_table_widget->setColumnCount(5);
-    ui->history_table_widget->setColumnWidth(0, static_cast<int>(width * 0.06));
-    ui->history_table_widget->setColumnWidth(1, static_cast<int>(width * 0.04));
-    ui->history_table_widget->setColumnWidth(2, static_cast<int>(width * 0.08));
-    ui->history_table_widget->setColumnWidth(3, static_cast<int>(width * 0.08));
-    ui->history_table_widget->setColumnWidth(4, static_cast<int>(width * 0.08));
-    ui->history_table_widget->verticalHeader()->setDefaultSectionSize(25);
+    ui->historyTableWidget->setColumnCount(5);
+    ui->historyTableWidget->setColumnWidth(0, static_cast<int>(width * 0.06));
+    ui->historyTableWidget->setColumnWidth(1, static_cast<int>(width * 0.04));
+    ui->historyTableWidget->setColumnWidth(2, static_cast<int>(width * 0.08));
+    ui->historyTableWidget->setColumnWidth(3, static_cast<int>(width * 0.08));
+    ui->historyTableWidget->setColumnWidth(4, static_cast<int>(width * 0.08));
+    ui->historyTableWidget->verticalHeader()->setDefaultSectionSize(25);
 
     QStringList headText;
     headText << "学号" << "姓名" << "学院" << "专业" << "上次见面";
-    ui->history_table_widget->setHorizontalHeaderLabels(headText);
-    ui->history_table_widget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->history_table_widget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->history_table_widget->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->history_table_widget->setAlternatingRowColors(true);
-    ui->history_table_widget->verticalHeader()->setVisible(false);
-    ui->history_table_widget->horizontalHeader()->setStretchLastSection(true);
+    ui->historyTableWidget->setHorizontalHeaderLabels(headText);
+    ui->historyTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->historyTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->historyTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->historyTableWidget->setAlternatingRowColors(true);
+    ui->historyTableWidget->verticalHeader()->setVisible(false);
+    ui->historyTableWidget->horizontalHeader()->setStretchLastSection(true);
 
     //设置行高
-    ui->history_table_widget->setRowCount(300);
+    ui->historyTableWidget->setRowCount(300);
 
     for (int i = 0; i < 300; i++) {
-        ui->history_table_widget->setRowHeight(i, 24);
+        ui->historyTableWidget->setRowHeight(i, 24);
 
         QTableWidgetItem *itemDeviceID = new QTableWidgetItem(QString::number(i + 1));
         QTableWidgetItem *itemDeviceName = new QTableWidgetItem(QString("名字%1").arg(i + 1));
@@ -126,43 +126,43 @@ void QUICreator::initHistoryWidget()
         QTableWidgetItem *itemContent = new QTableWidgetItem(QString("专业%1").arg(i + 1));
         QTableWidgetItem *itemTime = new QTableWidgetItem(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 
-        ui->history_table_widget->setItem(i, 0, itemDeviceID);
-        ui->history_table_widget->setItem(i, 1, itemDeviceName);
-        ui->history_table_widget->setItem(i, 2, itemDeviceAddr);
-        ui->history_table_widget->setItem(i, 3, itemContent);
-        ui->history_table_widget->setItem(i, 4, itemTime);
+        ui->historyTableWidget->setItem(i, 0, itemDeviceID);
+        ui->historyTableWidget->setItem(i, 1, itemDeviceName);
+        ui->historyTableWidget->setItem(i, 2, itemDeviceAddr);
+        ui->historyTableWidget->setItem(i, 3, itemContent);
+        ui->historyTableWidget->setItem(i, 4, itemTime);
     }
 }
 
 void QUICreator::initNav()
 {
     //设置左边按钮菜单
-    QList<QPushButton *> btns = ui->widget_vertical_menu->findChildren<QPushButton *>();
+    QList<QPushButton *> btns = ui->widgetVerticalMenu->findChildren<QPushButton *>();
 
     foreach (QPushButton *btn, btns) {
         btn->setCheckable(true);
         connect(btn, &QPushButton::clicked, this, &QUICreator::navBtnClicked);
     }
-    ui->btn_menu_debug->click();
+    ui->btnMenuDebug->click();
 }
 
 void QUICreator::initOther()
 {
-    ui->checkbox_face->setChecked(false);
-    ui->checkbox_pose->setChecked(false);
-    ui->checkbox_log->setChecked(false);
+    ui->checkboxFace->setChecked(false);
+    ui->checkboxPose->setChecked(false);
+    ui->checkboxLog->setChecked(false);
 
 
-    ui->widget_vertical_menu->setProperty("nav", "left");
+    ui->widgetVerticalMenu->setProperty("nav", "left");
 //    ui->widgetBottom->setProperty("form", "bottom");
     ui->widgetTop->setProperty("nav", "top");
 
-    ui->centralwidget->findChild<QWidget *>("widget_video")->setProperty("video", true);
+    ui->centralwidget->findChild<QWidget *>("widgetVideo")->setProperty("video", true);
 
-    ui->btn_pay->setEnabled(false);
+    ui->btnPay->setEnabled(false);
 
-    connect(ui->btn_ready_pay, &QPushButton::clicked, this, &QUICreator::btnReadyPayClicked);
-    connect(ui->btn_reset_pay, &QPushButton::clicked, this, &QUICreator::resetConsumption);
+    connect(ui->btnReadyPay, &QPushButton::clicked, this, &QUICreator::btnReadyPayClicked);
+    connect(ui->btnResetPay, &QPushButton::clicked, this, &QUICreator::resetConsumption);
 
     debugFunc();
 }
@@ -172,7 +172,7 @@ void QUICreator::navBtnClicked()
     QPushButton *btn = static_cast<QPushButton*>(sender());
     QString objName = btn->objectName();
 
-    QList<QPushButton *> btns = ui->widget_vertical_menu->findChildren<QPushButton *>();
+    QList<QPushButton *> btns = ui->widgetVerticalMenu->findChildren<QPushButton *>();
 
     foreach (QPushButton *b, btns) {
         if (b == btn) {
@@ -182,10 +182,10 @@ void QUICreator::navBtnClicked()
         }
     }
 
-    if (objName == "btn_menu_debug") {
-        ui->stacked_widget_debug->setCurrentIndex(0);
-    } else if (objName == "btn_menu_work") {
-        ui->stacked_widget_debug->setCurrentIndex(1);
+    if (objName == "btnMenuDebug") {
+        ui->stackedWidgetDebug->setCurrentIndex(0);
+    } else if (objName == "btnMenuWork") {
+        ui->stackedWidgetDebug->setCurrentIndex(1);
     }
 
 }
@@ -200,8 +200,6 @@ void QUICreator::initStyle()
 
         if (file.open(QFile::ReadOnly)) {
             QString str = file.readAll();
-            currentFile = fileName;
-            currentQSS = str;
             setStyle(str);
         }
     }
@@ -258,21 +256,21 @@ void QUICreator::insertLog(const QString& str)
         log += "\n";
     }
 
-    ui->plaintext_log->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
-    ui->plaintext_log->insertPlainText(log);
+    ui->plaintextLog->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
+    ui->plaintextLog->insertPlainText(log);
 }
 
 // 清零消费金额
 void QUICreator::resetConsumption()
 {
-    ui->spinbox_pay->setValue(0);
-    ui->btn_pay->setEnabled(false);
+    ui->spinboxPay->setValue(0);
+    ui->btnPay->setEnabled(false);
 }
 
 void QUICreator::btnReadyPayClicked()
 {
-    ui->btn_pay->setEnabled(true);
-    ui->btn_pay->setFocus();
+    ui->btnPay->setEnabled(true);
+    ui->btnPay->setFocus();
 }
 
 

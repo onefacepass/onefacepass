@@ -8,6 +8,13 @@ CameraViewfinder::CameraViewfinder(QWidget *parent)
 
 }
 
+CameraViewfinder::~CameraViewfinder()
+{
+    while (!q_log.isEmpty()) {
+        q_log.dequeue();
+    }
+}
+
 void CameraViewfinder::paintEvent(QPaintEvent *e)
 {
     QCameraViewfinder::paintEvent(e);
@@ -15,7 +22,7 @@ void CameraViewfinder::paintEvent(QPaintEvent *e)
     QPainter painter(this);
     painter.setPen(Qt::red);
 
-    if (this->q_log.empty()) {
+    if (!q_log.empty()) {
         QString log = this->q_log.dequeue();
 
         painter.drawText(10, 10, log);
@@ -27,3 +34,5 @@ void CameraViewfinder::insertLog(const QString &log)
 {
     this->q_log.enqueue(log);
 }
+
+
