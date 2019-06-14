@@ -1,4 +1,4 @@
-#include <QPainter>
+﻿#include <QPainter>
 
 #include "cameraviewfinder.h"
 
@@ -14,5 +14,16 @@ void CameraViewfinder::paintEvent(QPaintEvent *e)
 
     QPainter painter(this);
     painter.setPen(Qt::red);
-    painter.drawRect(50, 50, 100, 100);
+
+    if (this->q_log.empty()) {
+        QString log = this->q_log.dequeue();
+
+        painter.drawText(10, 10, log);
+    }
+
+}
+
+void CameraViewfinder::insertLog(const QString &log)
+{
+    this->q_log.enqueue(log);
 }
