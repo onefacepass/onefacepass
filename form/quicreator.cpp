@@ -225,15 +225,15 @@ void QUICreator::setStyle(const QString &str)
 
 void QUICreator::debugFunc()
 {
-    insertAnLog("log1");
-    insertAnLog("log2");
-    insertAnLog("log3");
+    insertLog("log1");
+    insertLog("log2");
+    insertLog("log3");
 }
 
 /* @func: 向调试界面插入一条日志
  * @str: 待插入的日志，无需关注结尾是否有'\n'
  */
-void QUICreator::insertAnLog(const QString& str)
+void QUICreator::insertLog(const QString& str)
 {
     static QString log;
     if (log == str) {

@@ -41,7 +41,7 @@ private slots:
     void setStyle(const QString &str);
 
 private:
-    void insertAnLog(const QString& log);
+    void insertLog(const QString& log);
     void debugFunc();           // TODO
 
 private slots:
