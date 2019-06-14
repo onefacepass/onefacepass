@@ -223,6 +223,14 @@ void QUICreator::setStyle(const QString &str)
     qApp->setStyleSheet(str);
 }
 
+/* @func: 在摄像头图像上显示日志，可能会有不到1s的延迟
+ * @log: 要显示的日志
+ */
+void QUICreator::displayLogOnCamera(const QString &log)
+{
+    ui->viewfinder->insertLog(log);
+}
+
 void QUICreator::debugFunc()
 {
     insertLog("log1");

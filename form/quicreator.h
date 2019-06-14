@@ -42,7 +42,9 @@ private slots:
 
 private:
     void insertLog(const QString& log);
+    void displayLogOnCamera(const QString& log);
     void debugFunc();           // TODO
+
 
 private slots:
     void setCamera(const QCameraInfo &cameraInfo);
