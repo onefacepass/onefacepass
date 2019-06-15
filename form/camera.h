@@ -1,4 +1,4 @@
-#ifndef CAMERA_H
+﻿#ifndef CAMERA_H
 #define CAMERA_H
 
 #include <QCamera>
@@ -37,6 +37,7 @@ private:
     QVideoEncoderSettings               video_settings;
     QString                             video_container_format;
 
+private:
     bool                                is_capturing_image;
     bool                                application_exting;
 };

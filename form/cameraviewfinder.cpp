@@ -19,7 +19,18 @@ void CameraViewfinder::paintEvent(QPaintEvent *e)
 {
     QCameraViewfinder::paintEvent(e);
 
+
+
     QPainter painter(this);
+
+    if (!is_camera_running) {
+        QPixmap pix;
+        pix.fill(Qt::black);
+        painter.drawPixmap(0, 0, pix);
+
+        return;
+    }
+
     painter.setPen(Qt::red);
 
     if (!q_log.empty()) {

@@ -115,9 +115,9 @@ void QUICreator::initHistoryWidget()
     ui->historyTableWidget->horizontalHeader()->setStretchLastSection(true);
 
     //设置行高
-    ui->historyTableWidget->setRowCount(300);
+    ui->historyTableWidget->setRowCount(10);
 
-    for (int i = 0; i < 300; i++) {
+    for (int i = 0; i < 10; i++) {
         ui->historyTableWidget->setRowHeight(i, 24);
 
         QTableWidgetItem *itemDeviceID = new QTableWidgetItem(QString::number(i + 1));
