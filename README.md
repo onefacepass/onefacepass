@@ -11,5 +11,5 @@ QtCreator导入OneFacePass.pro文件
 
 ## 项目结构 
 
-![readme](C:\Workspace\onefacepass\snap\readme.png)
+![readme](https://github.com/seahime/onefacepass/blob/master/snap/readme.png?raw=true)
 
