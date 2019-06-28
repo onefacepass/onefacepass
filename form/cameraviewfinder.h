@@ -22,7 +22,8 @@ public:
     ~CameraViewfinder();
 
     void insertLog(const QString& log);
-
+    void startCamera();
+    void stopCamera();
 
 };
 

@@ -12,18 +12,28 @@ QUICreator::QUICreator(QWidget *parent) :
 
     ui->setupUi(this);
     this->initForm();
+    this->initFace();
 }
 
 QUICreator::~QUICreator()
 {
     delete ui;
+    if (facedete) {
+        facedete->UninitEngine();
+
+        delete facedete;
+        facedete = nullptr;
+    }
 }
 
 void QUICreator::initForm()
 {
     initHistoryWidget();
+    initAction();
     initNav();
+
     initCamera();
+
     initOther();
 
     initStyle();
@@ -31,16 +41,54 @@ void QUICreator::initForm()
     ui->tabWidget->setCurrentIndex(0);
 }
 
+void QUICreator::initAction()
+{
+    QAction *actionAbout = new QAction(this);
+    actionAbout->setText(tr("关于"));
+    actionAbout->setToolTip(tr("关于一脸通"));
+    connect(actionAbout, &QAction::triggered, this, &QUICreator::about);
+
+
+    ui->menuHelp->addAction(actionAbout);
+}
+
+void QUICreator::initFace()
+{
+    qDebug() << "init face started";
+    facedete = new FaceDete();
+
+    facedete->SetAPPID("a4e18xLPPvPkB76rXtYM5GVraNduE3Q7vUnGPFLfhSj");
+    facedete->SetSDKKey("Fbu8Y5KNdMGpph8MrJc4GWceasdTeoGuCx3Qd4oRP6vs");
+    facedete->GetVersion();
+    facedete->Activation();
+    facedete->InitEngine();
+
+    facedete->SetPreloadPath("C:\\Workspace\\onefacepass\\face_recognition\\face_module\\sample");
+
+    facedete->Loadregface();
+
+    if (facedete->Loadregface() == -1) {
+        QUIWidget::showMessageBoxError("Error path!");
+    }
+
+}
+
+void QUICreator::about()
+{
+
+//    QUIWidget::showMessageBoxInfo(tr("关于一脸通"));
+//    QMessageBox::about(this, tr("关于一脸通"), tr("关于一脸通"));
+}
+
 // 加载摄像头
 void QUICreator::initCamera()
 {
-    this->camera = new Camera();
-
+    captureThread = new CaptureThread();
 
     // 加载“设备”菜单：后面现场调试时，可能电脑上会有多个摄像头设备吧！
     QActionGroup *videoDevicesGroup = new QActionGroup(this);
     videoDevicesGroup->setExclusive(true);
-    const QList<QCameraInfo> availableCameras = this->camera->get_available_camera_infos();
+    const QList<QCameraInfo> availableCameras = QCameraInfo::availableCameras();
     for (const QCameraInfo &cameraInfo : availableCameras) {
         QAction *videoDeviceAction = new QAction(cameraInfo.description(), videoDevicesGroup);
         videoDeviceAction->setCheckable(true);
@@ -53,19 +101,27 @@ void QUICreator::initCamera()
 
     connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
     connect(ui->checkboxCamera, &QCheckBox::stateChanged, this, &QUICreator::startAndStopCamera);
-//    connect(ui->captureWidget, &QTabWidget::currentChanged, this, &Camera::updateCaptureMode);
 
-    setCamera(this->camera->get_default_camera());
+    setCamera(QCameraInfo::defaultCamera());
     ui->checkboxCamera->setChecked(true);
+
+    connect(captureThread, &CaptureThread::CaptureNotice, this, &QUICreator::takeImage);
+    captureThread->start();
 }
 
+void QUICreator::takeImage()
+{
+    imageCapture->capture();
+}
 
 void QUICreator::startAndStopCamera()
 {
     if (ui->checkboxCamera->isChecked()) {
         camera->start();
+        ui->viewfinder->startCamera();
     } else {
         camera->stop();
+        ui->viewfinder->stopCamera();
     }
 }
 
@@ -78,17 +134,75 @@ void QUICreator::updateCamera(QAction *action)
 // 设置当前使用的摄像头
 void QUICreator::setCamera(const QCameraInfo &cameraInfo)
 {
-    this->camera->set_current_camera(cameraInfo);
-    connect(this->camera->get_current_camera(), QOverload<QCamera::Error>::of(&QCamera::error), this, &QUICreator::displayCameraError);
-    this->camera->setViewFinder(ui->viewfinder);
-    this->camera->start();
+    camera.reset(new QCamera(cameraInfo));
+    imageCapture.reset(new QCameraImageCapture(camera.data()));
+
+    connect(camera.data(), QOverload<QCamera::Error>::of(&QCamera::error), this, &QUICreator::displayCameraError);
+    connect(imageCapture.data(), &QCameraImageCapture::imageCaptured, this, &QUICreator::processCapturedImage);
+
+
+    // 仅将截图保存到缓冲区
+    if (imageCapture->isCaptureDestinationSupported(QCameraImageCapture::CaptureToBuffer) ) {
+        imageCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+    } else {
+        QUIWidget::showMessageBoxInfo("暂不支持将截图保存至缓冲区！");
+    }
+
+    camera->setCaptureMode(QCamera::CaptureStillImage);
+
+    camera->setViewfinder(ui->viewfinder);
+
+    camera->start();
 }
 
+void QUICreator::processCapturedImage(int requestId, const QImage& img)
+{
+    Q_UNUSED(requestId);
 
+    Json::Value detectedResult;
+
+    cv::Mat mat = QImage2Mat(img);
+
+    facedete->DetectFaces(mat, detectedResult);
+
+    if (detectedResult.size()) {
+        qDebug() << "有识别结果";
+    }
+
+    for (unsigned int i = 0; i < detectedResult.size(); i ++) {
+        Json::Value currRes = detectedResult[std::to_string(i)];
+        QString id(currRes["id"].asCString());
+        QString name(currRes["name"].asCString());
+        QString major(currRes["major"].asCString());
+
+        // 获取面部图像的范围坐标
+        for (int j = 0; j < 4; j ++) {
+            faceRect[j] = currRes["rect"].asInt();
+        }
+
+        qDebug() << "[ID]" << id;
+        qDebug() << "[Name]" << name;
+        qDebug() << "[Major]" << major;
+        qDebug() << "\n";
+
+    }
+
+    detectedResult.clear();
+}
+
+cv::Mat QUICreator::QImage2Mat(QImage const& src)
+{
+    cv::Mat tmp(src.height(), src.width(), CV_8UC3, (uchar*)src.bits(), src.bytesPerLine());
+    cv::Mat res;
+
+    cvtColor(tmp, res, COLOR_BGR2RGB);
+
+    return res;
+};
 
 void QUICreator::displayCameraError()
 {
-    QMessageBox::warning(this, tr("Camera Error"), this->camera->get_current_camera()->errorString());
+    QUIWidget::showMessageBoxError("Camera Error: " + camera->errorString());
 }
 
 // 加载历史记录

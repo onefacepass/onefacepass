@@ -1,4 +1,4 @@
-
+﻿
 
 #include "camera.h"
 
@@ -25,6 +25,7 @@ QCameraInfo Camera::get_default_camera()
 void Camera::set_current_camera(const QCameraInfo &cameraInfo)
 {
     this->camera.reset(new QCamera(cameraInfo));
+    image_capture.reset(new QCameraImageCapture(camera.data()));
 }
 
 

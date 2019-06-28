@@ -2,7 +2,15 @@
 #define QUICREATOR_H
 
 #include <QMainWindow>
-#include "camera.h"
+#include <QCamera>
+#include <QCameraViewfinder>
+#include <QCameraImageCapture>
+#include <QScopedPointer>
+#include <QCameraInfo>
+
+//#include "camera.h"
+#include "FaceDete.h"
+#include "capturethread.h"
 
 class QPushButton;
 class QLineEdit;
@@ -23,23 +31,32 @@ public:
 private:
     Ui::QUICreator *ui;
 
-    Camera* camera;
+    QScopedPointer<QCamera> camera;
+    QScopedPointer<QCameraImageCapture> imageCapture;
+
+    FaceDete* facedete;
+    CaptureThread *captureThread;
 
 private:
     void insertLog(const QString& log);
     void displayLogOnCamera(const QString& log);
     void debugFunc();           // TODO
-
+    cv::Mat QImage2Mat(QImage const& src);
+    int faceRect[4];
 
 private slots:
     void initForm();
     void initCamera();
     void initHistoryWidget();
     void initNav();
+    void initAction();
+    void initFace();
     void initOther();
 
     void startAndStopCamera();
     void setStyle(const QString &str);
+    void takeImage();
+    void processCapturedImage(int requestId, const QImage& img);
 
     void setCamera(const QCameraInfo &camera_info);
     void updateCamera(QAction *action);
@@ -50,6 +67,7 @@ private slots:
     void navBtnClicked();
 
     void initStyle();
+    void about();
 };
 
 #endif // QUICREATOR_H

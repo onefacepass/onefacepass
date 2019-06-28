@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 //    qui.setIconMain(QChar(0xf099), 11);
 
     //设置左上角图标-图片文件
-//    qui.setPixmap(QUIWidget::Lab_Ico, ":/main.ico");
+//    qui.setPixmap(QUIWidget::Lab_Ico, ":/logo.jpg");
 
     qui.show();
 
