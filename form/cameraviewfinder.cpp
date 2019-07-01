@@ -20,6 +20,17 @@ void CameraViewfinder::paintEvent(QPaintEvent *e)
     QCameraViewfinder::paintEvent(e);
 
     QPainter painter(this);
+
+
+    if (!is_camera_running) {
+        qDebug() << "camera stopped";
+        QPixmap pix(this->width(), this->height());
+        pix.fill(Qt::black);
+        painter.drawPixmap(10, 10, pix);
+
+        return;
+    }
+
     painter.setPen(Qt::red);
 
     if (!q_log.empty()) {
@@ -35,4 +46,13 @@ void CameraViewfinder::insertLog(const QString &log)
     this->q_log.enqueue(log);
 }
 
+void CameraViewfinder::startCamera()
+{
+    this->is_camera_running = true;
+}
+
+void CameraViewfinder::stopCamera()
+{
+    this->is_camera_running = false;
+}
 

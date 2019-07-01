@@ -15,29 +15,44 @@ RCC_DIR         = temp/rcc
 UI_DIR          = temp/ui
 OBJECTS_DIR     = temp/obj
 DESTDIR         = $$PWD/bin
-win32:RC_FILE   = other/main.rc
+#win32:RC_FILE   = other/main.rc
 PRECOMPILED_HEADER  = head.h
 
-INCLUDEPATH     += $$PWD
-INCLUDEPATH     += $$PWD/form
-INCLUDEPATH     += $$PWD/demo
-CONFIG          += qt warn_off
-#DEFINES         += DEBUG
+DEFINES += _DEBUG
 
-SOURCES += main.cpp\     \
+
+INCLUDEPATH     += $$PWD        \
+                    $$PWD/form  \
+                    C:/opencv/build/include/    \
+                    C:/ArcSoft/inc              \
+                    $$PWD/3rdparty/face_module/include   \
+                    $$PWD/3rdparty/jsoncpp/include
+
+CONFIG          += qt warn_off
+
+LIBS            += C:/opencv/build/x64/vc15/lib/opencv_world346d.lib   \
+                    $$PWD/3rdparty/face_module/lib/face_module.lib     \
+                    C:/ArcSoft/lib/X64/libarcsoft_face_engine.lib      \
+                    $$PWD/3rdparty/jsoncpp/lib/jsoncpp.lib
+
+
+
+SOURCES += main.cpp\
     form/cameraviewfinder.cpp \
+    form/capturethread.cpp \
     form/quiwidget.cpp \
     form/quicreator.cpp \
-    demo/appinit.cpp    \
-    form/camera.cpp
+    form/appinit.cpp
+
 
 
 HEADERS  += head.h\
     form/cameraviewfinder.h \
+    form/capturethread.h \
     form/quiwidget.h \
     form/quicreator.h \
-    demo/appinit.h  \
-    form/camera.h
+    form/appinit.h
+
 
 
 FORMS    += \
@@ -47,4 +62,3 @@ FORMS    += \
 RESOURCES += \
     other/qss.qrc \
     other/main.qrc
-
