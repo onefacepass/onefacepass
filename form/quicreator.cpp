@@ -162,13 +162,17 @@ void QUICreator::processCapturedImage(int requestId, const QImage& img)
 
 //    cv::imshow("debug", mat);
 
-    facedete->DetectFaces(mat, detectedResult);
+    if (facedete->DetectFaces(mat, detectedResult)) {
+        qDebug() << "something is wrong while detecting";
+    }
 
+#ifdef DEBUG
     if (detectedResult.size()) {
         qDebug() << "有识别结果";
     } else {
         qDebug() << "无识别结果";
     }
+#endif
 
     for (unsigned int i = 0; i < detectedResult.size(); i ++) {
         Json::Value currRes = detectedResult[std::to_string(i)];
@@ -178,7 +182,7 @@ void QUICreator::processCapturedImage(int requestId, const QImage& img)
 
         // 获取面部图像的范围坐标
         for (int j = 0; j < 4; j ++) {
-            faceRect[j] = currRes["rect"].asInt();
+            faceRect[j] = currRes["rect"][j].asInt();
         }
 
         qDebug() << "[ID]" << id;
@@ -190,27 +194,31 @@ void QUICreator::processCapturedImage(int requestId, const QImage& img)
     detectedResult.clear();
 }
 
-cv::Mat QUICreator::QImage2Mat(QImage const& image)
+cv::Mat QUICreator::QImage2Mat(QImage image)
 {
     cv::Mat mat;
+
+//    image = image.convertToFormat(QImage::Format_RGB888);
+
     switch(image.format())
     {
     case QImage::Format_ARGB32:
     case QImage::Format_RGB32:
     case QImage::Format_ARGB32_Premultiplied:
         mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
+        cv::cvtColor(mat,mat,COLOR_RGBA2BGR);
         break;
     case QImage::Format_RGB888:
         mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
-        cv::cvtColor(mat, mat, CV_BGR2RGB);
-        break;
-    case QImage::Format_Indexed8:
-        mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+        cv::cvtColor(mat, mat, CV_RGB2BGR);
         break;
     default:
         qDebug() << "QUICreator::QImage2Mat | " << image.format();
         break;
     }
+
+
+
     return mat;
 };
 

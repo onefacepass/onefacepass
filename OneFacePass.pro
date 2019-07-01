@@ -10,7 +10,7 @@ DESTDIR         = $$PWD/bin
 #win32:RC_FILE   = other/main.rc
 PRECOMPILED_HEADER  = head.h
 
-DEFINES += _DEBUG
+DEFINES += DEBUG=\\\"true\\\"
 
 
 INCLUDEPATH     +=  $$PWD        \
