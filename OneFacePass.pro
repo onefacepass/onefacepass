@@ -1,12 +1,4 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2017-02-19T12:55:42
-#
-#-------------------------------------------------
-
-QT       += core gui network multimedia multimediawidgets
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT       += core widgets gui network multimedia multimediawidgets
 
 TARGET          = OneFacePass
 TEMPLATE        = app
@@ -24,7 +16,7 @@ DEFINES += _DEBUG
 INCLUDEPATH     +=  $$PWD        \
                     $$PWD/form  \
                     $$(OPENCV)/include/    \
-                    $$(ARCSOFT)/inc              \
+                    $$(ARCFACE)/inc              \
                     $$PWD/3rdparty/face_module/include   \
                     $$PWD/3rdparty/jsoncpp/include
 
@@ -32,7 +24,7 @@ CONFIG          += qt warn_off
 
 LIBS            +=  $$(OPENCV)/x64/vc15/lib/opencv_world346d.lib   \
                     $$PWD/3rdparty/face_module/lib/face_module.lib     \
-                    $$(ARCSOFT)/lib/X64/libarcsoft_face_engine.lib      \
+                    $$(ARCFACE)/lib/X64/libarcsoft_face_engine.lib      \
                     $$PWD/3rdparty/jsoncpp/lib/jsoncpp.lib
 
 
