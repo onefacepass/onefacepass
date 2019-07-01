@@ -18,24 +18,22 @@ DESTDIR         = $$PWD/bin
 #win32:RC_FILE   = other/main.rc
 PRECOMPILED_HEADER  = head.h
 
-#DEFINES += _DEBUG
+DEFINES += _DEBUG
 
 
-INCLUDEPATH     += $$PWD \
+INCLUDEPATH     += $$PWD        \
                     $$PWD/form  \
-                    $$PWD/demo  \
-                    C:\opencv\build\include\    \
-                    C:\ArcSoft\inc  \
-                    $$PWD/face_recognition/face_module/inc    \
-                    $$PWD/face_recognition/third_party/jsoncpp/inc
+                    C:/opencv/build/include/    \
+                    C:/ArcSoft/inc              \
+                    $$PWD/3rdparty/face_module/include   \
+                    $$PWD/3rdparty/jsoncpp/include
 
 CONFIG          += qt warn_off
 
-LIBS            += C:\ArcSoft\lib\X64\libarcsoft_face_engine.lib             \
-                    C:\opencv\build\x64\vc15\lib\opencv_world410d.lib        \
-#                    $$PWD/face_recognition/x64/Debug/face_module.lib         \
-                    C:\Users\haoha\source\repos\face_test\x64\Debug\face_test.lib \
-                    $$PWD/face_recognition/third_party/jsoncpp/lib/jsoncpp.lib
+LIBS            += C:/opencv/build/x64/vc15/lib/opencv_world346d.lib   \
+                    $$PWD/3rdparty/face_module/lib/face_module.lib     \
+                    C:/ArcSoft/lib/X64/libarcsoft_face_engine.lib      \
+                    $$PWD/3rdparty/jsoncpp/lib/jsoncpp.lib
 
 
 
@@ -44,8 +42,7 @@ SOURCES += main.cpp\
     form/capturethread.cpp \
     form/quiwidget.cpp \
     form/quicreator.cpp \
-    demo/appinit.cpp
-#    face_recognition/face_module/src/*.cpp
+    form/appinit.cpp
 
 
 
@@ -54,9 +51,7 @@ HEADERS  += head.h\
     form/capturethread.h \
     form/quiwidget.h \
     form/quicreator.h \
-    demo/appinit.h  \
-    face_recognition/face_module/inc/FaceDete.h
-#    face_recognition/face_module/inc/*.h
+    form/appinit.h
 
 
 
@@ -67,4 +62,3 @@ FORMS    += \
 RESOURCES += \
     other/qss.qrc \
     other/main.qrc
-

@@ -1,6 +1,6 @@
 ﻿#include "form/quiwidget.h"
 #include "form/quicreator.h"
-#include "demo/appinit.h"
+#include "form/appinit.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])

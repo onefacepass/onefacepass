@@ -8,7 +8,6 @@
 #include <QScopedPointer>
 #include <QCameraInfo>
 
-//#include "camera.h"
 #include "FaceDete.h"
 #include "capturethread.h"
 

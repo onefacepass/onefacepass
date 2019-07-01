@@ -54,7 +54,6 @@ void QUICreator::initAction()
 
 void QUICreator::initFace()
 {
-    qDebug() << "init face started";
     facedete = new FaceDete();
 
     facedete->SetAPPID("a4e18xLPPvPkB76rXtYM5GVraNduE3Q7vUnGPFLfhSj");
@@ -63,9 +62,7 @@ void QUICreator::initFace()
     facedete->Activation();
     facedete->InitEngine();
 
-    facedete->SetPreloadPath("C:\\Workspace\\onefacepass\\face_recognition\\face_module\\sample");
-
-    facedete->Loadregface();
+    facedete->SetPreloadPath("C:\\Workspace\\onefacepass\\sample");
 
     if (facedete->Loadregface() == -1) {
         QUIWidget::showMessageBoxError("Error path!");
@@ -157,7 +154,7 @@ void QUICreator::setCamera(const QCameraInfo &cameraInfo)
 
 void QUICreator::processCapturedImage(int requestId, const QImage& img)
 {
-    Q_UNUSED(requestId);
+    Q_UNUSED(requestId)
 
     Json::Value detectedResult;
 
@@ -167,6 +164,8 @@ void QUICreator::processCapturedImage(int requestId, const QImage& img)
 
     if (detectedResult.size()) {
         qDebug() << "有识别结果";
+    } else {
+        qDebug() << "无识别结果";
     }
 
     for (unsigned int i = 0; i < detectedResult.size(); i ++) {
@@ -184,7 +183,6 @@ void QUICreator::processCapturedImage(int requestId, const QImage& img)
         qDebug() << "[Name]" << name;
         qDebug() << "[Major]" << major;
         qDebug() << "\n";
-
     }
 
     detectedResult.clear();
