@@ -21,18 +21,18 @@ PRECOMPILED_HEADER  = head.h
 DEFINES += _DEBUG
 
 
-INCLUDEPATH     += $$PWD        \
+INCLUDEPATH     +=  $$PWD        \
                     $$PWD/form  \
-                    C:/opencv/build/include/    \
-                    C:/ArcSoft/inc              \
+                    $$(OPENCV)/include/    \
+                    $$(ARCSOFT)/inc              \
                     $$PWD/3rdparty/face_module/include   \
                     $$PWD/3rdparty/jsoncpp/include
 
 CONFIG          += qt warn_off
 
-LIBS            += C:/opencv/build/x64/vc15/lib/opencv_world346d.lib   \
+LIBS            +=  $$(OPENCV)/x64/vc15/lib/opencv_world346d.lib   \
                     $$PWD/3rdparty/face_module/lib/face_module.lib     \
-                    C:/ArcSoft/lib/X64/libarcsoft_face_engine.lib      \
+                    $$(ARCSOFT)/lib/X64/libarcsoft_face_engine.lib      \
                     $$PWD/3rdparty/jsoncpp/lib/jsoncpp.lib
 
 
