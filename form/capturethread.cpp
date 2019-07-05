@@ -1,6 +1,6 @@
 ﻿#include "capturethread.h"
 
-CaptureThread::CaptureThread()
+CaptureThread::CaptureThread() : QThread ()
 {
 
 }
@@ -13,7 +13,7 @@ CaptureThread::CaptureThread()
 void CaptureThread::run()
 {
     while (true) {
-        emit CaptureNotice();
         QThread::msleep(1000);
+        emit CaptureNotice();
     }
 }
