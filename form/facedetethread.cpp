@@ -16,7 +16,7 @@ void FaceDeteThread::StopImmediately()
 
 void FaceDeteThread::run()
 {
-//    while (1) {
+    while (1) {
 
         {
             QMutexLocker locker(&lock);
@@ -72,7 +72,7 @@ void FaceDeteThread::run()
 //        }
 
 
-//    }
+    }
 
 
 #ifdef DEBUG
@@ -80,7 +80,13 @@ void FaceDeteThread::run()
 #endif
 }
 
-void FaceDeteThread::ReceiveImg(QImage _img)
+void FaceDeteThread::CanRun()
+{
+    QMutexLocker locker(&lock);
+    shouldRun = true;
+}
+
+void FaceDeteThread::ReceiveImg(const QImage& _img)
 {
 #ifdef DEBUG_FACE
     qDebug() << "FaceDeteThread | received image";

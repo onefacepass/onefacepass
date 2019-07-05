@@ -36,7 +36,7 @@ private:
 
     FaceDete* facedete;
     CaptureThread *captureThread;
-//    FaceDeteThread *faceThread;
+    FaceDeteThread *faceThread;
 
 private:
     void insertLog(const QString& log);

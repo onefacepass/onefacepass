@@ -128,6 +128,14 @@ void QUICreator::initNav()
 
 void QUICreator::initOther()
 {
+
+    faceThread = new FaceDeteThread();
+    faceThread->CanRun();
+//    connect(faceThread, &QThread::finished, faceThread, &QObject::deleteLater);
+    connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::debug_show_detect_result);
+
+//    QThreadPool::globalInstance()->setMaxThreadCount(8);
+
     ui->checkboxFace->setChecked(false);
     ui->checkboxPose->setChecked(false);
     ui->checkboxLog->setChecked(false);
@@ -237,18 +245,23 @@ void QUICreator::processCapturedImage(int requestId, const QImage& img)
 {
     Q_UNUSED(requestId)
 
+    if (faceThread->isRunning()) {
+        return;
+    }
 
-    FaceDeteThread* faceThread = new FaceDeteThread();
-    connect(faceThread, &QThread::finished, faceThread, &QObject::deleteLater);
-    connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::debug_show_detect_result);
+    faceThread->CanRun();
 
     faceThread->ReceiveImg(img);
 
+
     faceThread->start();
+
 }
 
 void QUICreator::debug_show_detect_result(Student res)
 {
+    faceThread->StopImmediately();
+
     if (res.id == "null") {
         qDebug() << "QUICreator | no detect result";
         return;

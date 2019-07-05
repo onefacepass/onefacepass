@@ -4,8 +4,11 @@
 #include <QMutex>
 #include <QImage>
 #include <QList>
+//#include <QRunnable>
+//#include <QThreadPool>
 
 #include "FaceDete.h"
+
 
 typedef struct t_student {
     QString id;
@@ -14,7 +17,8 @@ typedef struct t_student {
     int faceRect[4];
 } Student;
 
-class FaceDeteThread : public QThread
+//class FaceDeteThread :  public QObject, public QRunnable
+class FaceDeteThread :  public QThread
 {
     Q_OBJECT
 public:
@@ -37,8 +41,9 @@ signals:
     void DetectFinished(Student res);
 
 public slots:
-    void ReceiveImg(QImage _img);
+    void ReceiveImg(const QImage& _img);
     void StopImmediately();
+    void CanRun();
 };
 
 #endif // FACEDETETHREAD_H
