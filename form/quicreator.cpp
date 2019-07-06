@@ -24,6 +24,7 @@ QUICreator::~QUICreator()
         delete facedete;
         facedete = nullptr;
     }
+//    captureThread->s
 }
 
 void QUICreator::initForm()
@@ -70,6 +71,93 @@ void QUICreator::initFace()
 
 }
 
+// 加载历史记录
+void QUICreator::initHistoryWidget()
+{
+    //设置列数和列宽
+    int width = qApp->desktop()->availableGeometry().width() - 120;
+    ui->historyTableWidget->setColumnCount(5);
+    ui->historyTableWidget->setColumnWidth(0, static_cast<int>(width * 0.06));
+    ui->historyTableWidget->setColumnWidth(1, static_cast<int>(width * 0.04));
+    ui->historyTableWidget->setColumnWidth(2, static_cast<int>(width * 0.08));
+    ui->historyTableWidget->setColumnWidth(3, static_cast<int>(width * 0.08));
+    ui->historyTableWidget->setColumnWidth(4, static_cast<int>(width * 0.08));
+    ui->historyTableWidget->verticalHeader()->setDefaultSectionSize(25);
+
+    QStringList headText;
+    headText << "学号" << "姓名" << "学院" << "专业" << "上次见面";
+    ui->historyTableWidget->setHorizontalHeaderLabels(headText);
+    ui->historyTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->historyTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->historyTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->historyTableWidget->setAlternatingRowColors(true);
+    ui->historyTableWidget->verticalHeader()->setVisible(false);
+    ui->historyTableWidget->horizontalHeader()->setStretchLastSection(true);
+
+    //设置行高
+    ui->historyTableWidget->setRowCount(10);
+
+    for (int i = 0; i < 10; i++) {
+        ui->historyTableWidget->setRowHeight(i, 24);
+
+        QTableWidgetItem *itemDeviceID = new QTableWidgetItem(QString::number(i + 1));
+        QTableWidgetItem *itemDeviceName = new QTableWidgetItem(QString("名字%1").arg(i + 1));
+        QTableWidgetItem *itemDeviceAddr = new QTableWidgetItem(QString("学院%1").arg(i + 1));
+        QTableWidgetItem *itemContent = new QTableWidgetItem(QString("专业%1").arg(i + 1));
+        QTableWidgetItem *itemTime = new QTableWidgetItem(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+
+        ui->historyTableWidget->setItem(i, 0, itemDeviceID);
+        ui->historyTableWidget->setItem(i, 1, itemDeviceName);
+        ui->historyTableWidget->setItem(i, 2, itemDeviceAddr);
+        ui->historyTableWidget->setItem(i, 3, itemContent);
+        ui->historyTableWidget->setItem(i, 4, itemTime);
+    }
+}
+
+void QUICreator::initNav()
+{
+    //设置左边按钮菜单
+    QList<QPushButton *> btns = ui->widgetVerticalMenu->findChildren<QPushButton *>();
+
+    foreach (QPushButton *btn, btns) {
+        btn->setCheckable(true);
+        connect(btn, &QPushButton::clicked, this, &QUICreator::navBtnClicked);
+    }
+    ui->btnMenuDebug->click();
+}
+
+void QUICreator::initOther()
+{
+
+    faceThread = new FaceDeteThread();
+    faceThread->CanRun();
+//    connect(faceThread, &QThread::finished, faceThread, &QObject::deleteLater);
+    connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::debug_show_detect_result);
+
+//    QThreadPool::globalInstance()->setMaxThreadCount(8);
+
+    ui->checkboxFace->setChecked(false);
+    ui->checkboxPose->setChecked(false);
+    ui->checkboxLog->setChecked(false);
+
+
+    ui->widgetVerticalMenu->setProperty("nav", "left");
+//    ui->widgetBottom->setProperty("form", "bottom");
+    ui->widgetTop->setProperty("nav", "top");
+
+    ui->centralwidget->findChild<QWidget *>("widgetVideo")->setProperty("video", true);
+
+//    ui->btnPay->setEnabled(false);
+
+    connect(ui->btnReadyPay, &QPushButton::clicked, this, &QUICreator::btnReadyPayClicked);
+    connect(ui->btnResetPay, &QPushButton::clicked, this, &QUICreator::resetConsumption);
+
+    connect(ui->btnPay, &QPushButton::clicked, this, &QUICreator::btnPayClicked);
+
+
+    debugFunc();
+}
+
 void QUICreator::about()
 {
 
@@ -81,6 +169,7 @@ void QUICreator::about()
 void QUICreator::initCamera()
 {
     captureThread = new CaptureThread();
+    connect(captureThread, &QThread::finished, captureThread, &QObject::deleteLater);
 
     // 加载“设备”菜单：后面现场调试时，可能电脑上会有多个摄像头设备吧！
     QActionGroup *videoDevicesGroup = new QActionGroup(this);
@@ -152,148 +241,45 @@ void QUICreator::setCamera(const QCameraInfo &cameraInfo)
     camera->start();
 }
 
-void QUICreator::processCapturedImage(int requestId, const QImage& img)
+void QUICreator::processCapturedImage(int requestId, const QImage& _img)
 {
     Q_UNUSED(requestId)
 
-    Json::Value detectedResult;
+//    qDebug() << _img.format();
 
-    cv::Mat mat = QImage2Mat(img);
+//    QImage img = _img.convertToFormat(QImage::Format_BGR30);
 
-//    cv::imshow("debug", mat);
-
-    facedete->DetectFaces(mat, detectedResult);
-
-    if (detectedResult.size()) {
-        qDebug() << "有识别结果";
-    } else {
-        qDebug() << "无识别结果";
+    if (faceThread->isRunning()) {
+        return;
     }
 
-    for (unsigned int i = 0; i < detectedResult.size(); i ++) {
-        Json::Value currRes = detectedResult[std::to_string(i)];
-        QString id(currRes["id"].asCString());
-        QString name(currRes["name"].asCString());
-        QString major(currRes["major"].asCString());
+    faceThread->CanRun();
 
-        // 获取面部图像的范围坐标
-        for (int j = 0; j < 4; j ++) {
-            faceRect[j] = currRes["rect"].asInt();
-        }
+    faceThread->ReceiveImg(_img);
 
-        qDebug() << "[ID]" << id;
-        qDebug() << "[Name]" << name;
-        qDebug() << "[Major]" << major;
-        qDebug() << "\n";
-    }
 
-    detectedResult.clear();
+    faceThread->start();
+
 }
 
-cv::Mat QUICreator::QImage2Mat(QImage const& image)
+void QUICreator::debug_show_detect_result(Student res)
 {
-    cv::Mat mat;
-    switch(image.format())
-    {
-    case QImage::Format_ARGB32:
-    case QImage::Format_RGB32:
-    case QImage::Format_ARGB32_Premultiplied:
-        mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
-        break;
-    case QImage::Format_RGB888:
-        mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
-        cv::cvtColor(mat, mat, CV_BGR2RGB);
-        break;
-    case QImage::Format_Indexed8:
-        mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
-        break;
-    default:
-        qDebug() << "QUICreator::QImage2Mat | " << image.format();
-        break;
+    faceThread->StopImmediately();
+
+    if (res.id == "null") {
+//        qDebug() << "\033[31m" << "QUICreator | no detect result" << "\033[0m";
+        return;
     }
-    return mat;
-};
+    qDebug()<< "\033[32m" << res.id << "\t" << res.name << "\t" << res.major
+             << "[" << res.faceRect[0] << " " << res.faceRect[1] << " " << res.faceRect[2] << " " << res.faceRect[3] << "]" << "\033[0m";
+}
 
 void QUICreator::displayCameraError()
 {
     QUIWidget::showMessageBoxError("Camera Error: " + camera->errorString());
 }
 
-// 加载历史记录
-void QUICreator::initHistoryWidget()
-{
-    //设置列数和列宽
-    int width = qApp->desktop()->availableGeometry().width() - 120;
-    ui->historyTableWidget->setColumnCount(5);
-    ui->historyTableWidget->setColumnWidth(0, static_cast<int>(width * 0.06));
-    ui->historyTableWidget->setColumnWidth(1, static_cast<int>(width * 0.04));
-    ui->historyTableWidget->setColumnWidth(2, static_cast<int>(width * 0.08));
-    ui->historyTableWidget->setColumnWidth(3, static_cast<int>(width * 0.08));
-    ui->historyTableWidget->setColumnWidth(4, static_cast<int>(width * 0.08));
-    ui->historyTableWidget->verticalHeader()->setDefaultSectionSize(25);
 
-    QStringList headText;
-    headText << "学号" << "姓名" << "学院" << "专业" << "上次见面";
-    ui->historyTableWidget->setHorizontalHeaderLabels(headText);
-    ui->historyTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->historyTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->historyTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->historyTableWidget->setAlternatingRowColors(true);
-    ui->historyTableWidget->verticalHeader()->setVisible(false);
-    ui->historyTableWidget->horizontalHeader()->setStretchLastSection(true);
-
-    //设置行高
-    ui->historyTableWidget->setRowCount(10);
-
-    for (int i = 0; i < 10; i++) {
-        ui->historyTableWidget->setRowHeight(i, 24);
-
-        QTableWidgetItem *itemDeviceID = new QTableWidgetItem(QString::number(i + 1));
-        QTableWidgetItem *itemDeviceName = new QTableWidgetItem(QString("名字%1").arg(i + 1));
-        QTableWidgetItem *itemDeviceAddr = new QTableWidgetItem(QString("学院%1").arg(i + 1));
-        QTableWidgetItem *itemContent = new QTableWidgetItem(QString("专业%1").arg(i + 1));
-        QTableWidgetItem *itemTime = new QTableWidgetItem(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-
-        ui->historyTableWidget->setItem(i, 0, itemDeviceID);
-        ui->historyTableWidget->setItem(i, 1, itemDeviceName);
-        ui->historyTableWidget->setItem(i, 2, itemDeviceAddr);
-        ui->historyTableWidget->setItem(i, 3, itemContent);
-        ui->historyTableWidget->setItem(i, 4, itemTime);
-    }
-}
-
-void QUICreator::initNav()
-{
-    //设置左边按钮菜单
-    QList<QPushButton *> btns = ui->widgetVerticalMenu->findChildren<QPushButton *>();
-
-    foreach (QPushButton *btn, btns) {
-        btn->setCheckable(true);
-        connect(btn, &QPushButton::clicked, this, &QUICreator::navBtnClicked);
-    }
-    ui->btnMenuDebug->click();
-}
-
-void QUICreator::initOther()
-{
-    ui->checkboxFace->setChecked(false);
-    ui->checkboxPose->setChecked(false);
-    ui->checkboxLog->setChecked(false);
-
-
-    ui->widgetVerticalMenu->setProperty("nav", "left");
-//    ui->widgetBottom->setProperty("form", "bottom");
-    ui->widgetTop->setProperty("nav", "top");
-
-    ui->centralwidget->findChild<QWidget *>("widgetVideo")->setProperty("video", true);
-
-    ui->btnPay->setEnabled(false);
-
-    connect(ui->btnReadyPay, &QPushButton::clicked, this, &QUICreator::btnReadyPayClicked);
-    connect(ui->btnResetPay, &QPushButton::clicked, this, &QUICreator::resetConsumption);
-
-    debugFunc();
-}
 
 void QUICreator::navBtnClicked()
 {
@@ -392,13 +378,13 @@ void QUICreator::insertLog(const QString& str)
 void QUICreator::resetConsumption()
 {
     ui->spinboxPay->setValue(0);
-    ui->btnPay->setEnabled(false);
+//    ui->btnPay->setEnabled(false);
 }
 
 void QUICreator::btnReadyPayClicked()
 {
-    ui->btnPay->setEnabled(true);
-    ui->btnPay->setFocus();
+//    ui->btnPay->setEnabled(true);
+//    ui->btnPay->setFocus();
 }
 
 
@@ -407,4 +393,5 @@ void QUICreator::btnReadyPayClicked()
 void QUICreator::btnPayClicked()
 {
     // 是不是要在这里验证身份
+    takeImage();
 }

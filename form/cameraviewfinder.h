@@ -12,6 +12,7 @@ class CameraViewfinder : public QCameraViewfinder
 {
 private:
     QQueue<QString> q_log;
+    int rect[4];
     bool is_camera_running = true;
 
 protected:
@@ -25,6 +26,7 @@ public:
     void startCamera();
     void stopCamera();
 
+    void ReceiveRect(int r[4]);
 };
 
 #endif // CAMERAVIEWFINDER_H

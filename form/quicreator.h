@@ -10,6 +10,7 @@
 
 #include "FaceDete.h"
 #include "capturethread.h"
+#include "facedetethread.h"
 
 class QPushButton;
 class QLineEdit;
@@ -35,13 +36,13 @@ private:
 
     FaceDete* facedete;
     CaptureThread *captureThread;
+    FaceDeteThread *faceThread;
 
 private:
     void insertLog(const QString& log);
     void displayLogOnCamera(const QString& log);
     void debugFunc();           // TODO
-    cv::Mat QImage2Mat(QImage const& src);
-    int faceRect[4];
+
 
 private slots:
     void initForm();
@@ -67,6 +68,8 @@ private slots:
 
     void initStyle();
     void about();
+
+    void debug_show_detect_result(Student res);
 };
 
 #endif // QUICREATOR_H
