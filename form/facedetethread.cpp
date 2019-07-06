@@ -29,11 +29,11 @@ void FaceDeteThread::run()
         }
 
 #ifdef DEBUG_FACE
+//    cv::imwrite("C:\\Users\\haoha\\Pictures\\mat.png", mat);
     qDebug() << "FaceDeteThread | detecting...";
 #endif
-
         if (facedete->DetectFaces(mat, detectedResult)) {
-            qDebug() << "something is wrong while detecting";
+            qDebug() << "FaceDeteThread | something is wrong while detecting";
         }
 
 #ifdef DEBUG_FACE
@@ -41,7 +41,12 @@ void FaceDeteThread::run()
 #endif
 
         if (detectedResult.empty()) {
+#ifdef DEBUG_FACE
+        qDebug() << "\033[31m" << "FaceDeteThread | detectedResult empty! "
+                 << detectedResult.size() << "\033[0m";
+#endif
             emit DetectFinished({"null", "", "", {0, 0, 0, 0}});
+            // todo: emit DetectFinishedWithoutResult
             return;
         }
 
@@ -92,5 +97,5 @@ void FaceDeteThread::ReceiveImg(const QImage& image)
     qDebug() << "FaceDeteThread | " << cv::typeToString(mat.type()).c_str();
 #endif
 //    cv::imshow("debug", mat);
-    cv::imwrite("C:\\Users\\haoha\\Pictures\\mat.png", mat);
+//    cv::imwrite("C:\\Users\\haoha\\Pictures\\mat.png", mat);
 }

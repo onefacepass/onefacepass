@@ -267,7 +267,7 @@ void QUICreator::debug_show_detect_result(Student res)
     faceThread->StopImmediately();
 
     if (res.id == "null") {
-        qDebug() << "\033[31m" << "QUICreator | no detect result" << "\033[0m";
+//        qDebug() << "\033[31m" << "QUICreator | no detect result" << "\033[0m";
         return;
     }
     qDebug()<< "\033[32m" << res.id << "\t" << res.name << "\t" << res.major

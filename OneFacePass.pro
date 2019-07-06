@@ -10,7 +10,8 @@ DESTDIR         = $$PWD/bin
 #win32:RC_FILE   = other/main.rc
 PRECOMPILED_HEADER  = head.h
 
-DEFINES += DEBUG=\\\"true\\\"
+DEFINES +=  DEBUG=\\\"true\\\"
+DEFINES +=  DEBUG_FACE=\\\"true\\\"
 
 
 INCLUDEPATH     +=  $$PWD        \
@@ -32,6 +33,7 @@ LIBS            +=  $$(OPENCV)/x64/vc15/lib/opencv_world346d.lib   \
 SOURCES += main.cpp\
     form/cameraviewfinder.cpp \
     form/capturethread.cpp \
+    form/facedetethread.cpp \
     form/quiwidget.cpp \
     form/quicreator.cpp \
     form/appinit.cpp
@@ -41,6 +43,7 @@ SOURCES += main.cpp\
 HEADERS  += head.h\
     form/cameraviewfinder.h \
     form/capturethread.h \
+    form/facedetethread.h \
     form/quiwidget.h \
     form/quicreator.h \
     form/appinit.h

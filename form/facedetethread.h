@@ -41,6 +41,7 @@ protected:
 
 signals:
     void DetectFinished(Student res);
+    void DetectFinishedWihoutResult();
 
 public slots:
     void ReceiveImg(const QImage& _img);
