@@ -241,9 +241,13 @@ void QUICreator::setCamera(const QCameraInfo &cameraInfo)
     camera->start();
 }
 
-void QUICreator::processCapturedImage(int requestId, const QImage& img)
+void QUICreator::processCapturedImage(int requestId, const QImage& _img)
 {
     Q_UNUSED(requestId)
+
+//    qDebug() << _img.format();
+
+//    QImage img = _img.convertToFormat(QImage::Format_BGR30);
 
     if (faceThread->isRunning()) {
         return;
@@ -251,7 +255,7 @@ void QUICreator::processCapturedImage(int requestId, const QImage& img)
 
     faceThread->CanRun();
 
-    faceThread->ReceiveImg(img);
+    faceThread->ReceiveImg(_img);
 
 
     faceThread->start();
@@ -263,40 +267,12 @@ void QUICreator::debug_show_detect_result(Student res)
     faceThread->StopImmediately();
 
     if (res.id == "null") {
-        qDebug() << "QUICreator | no detect result";
+        qDebug() << "\033[31m" << "QUICreator | no detect result" << "\033[0m";
         return;
     }
-    qDebug() << res.id << "\t" << res.name << "\t" << res.major
-             << "[" << res.faceRect[0] << " " << res.faceRect[1] << " " << res.faceRect[2] << " " << res.faceRect[3] << "]";
+    qDebug()<< "\033[32m" << res.id << "\t" << res.name << "\t" << res.major
+             << "[" << res.faceRect[0] << " " << res.faceRect[1] << " " << res.faceRect[2] << " " << res.faceRect[3] << "]" << "\033[0m";
 }
-
-cv::Mat QUICreator::QImage2Mat(QImage image)
-{
-    cv::Mat mat;
-
-//    image = image.convertToFormat(QImage::Format_RGB888);
-
-    switch(image.format())
-    {
-    case QImage::Format_ARGB32:
-    case QImage::Format_RGB32:
-    case QImage::Format_ARGB32_Premultiplied:
-        mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
-        cv::cvtColor(mat,mat,COLOR_RGBA2BGR);
-        break;
-    case QImage::Format_RGB888:
-        mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
-        cv::cvtColor(mat, mat, CV_RGB2BGR);
-        break;
-    default:
-        qDebug() << "QUICreator::QImage2Mat | " << image.format();
-        break;
-    }
-
-
-
-    return mat;
-};
 
 void QUICreator::displayCameraError()
 {

@@ -17,6 +17,8 @@ typedef struct t_student {
     int faceRect[4];
 } Student;
 
+
+
 //class FaceDeteThread :  public QObject, public QRunnable
 class FaceDeteThread :  public QThread
 {
@@ -30,7 +32,7 @@ private:
     QImage img;
     cv::Mat mat;
     int faceRect[4];
-    bool shouldRun;
+    bool canRun;
     Json::Value detectedResult;
     QList<Student> result;
 

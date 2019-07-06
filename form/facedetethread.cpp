@@ -3,24 +3,27 @@
 #include "facedetethread.h"
 
 
-FaceDeteThread::FaceDeteThread() : shouldRun(true)
+FaceDeteThread::FaceDeteThread() : canRun(true)
 {
     facedete = new FaceDete();
+    qRegisterMetaType<Student>("Student");
 }
 
 void FaceDeteThread::StopImmediately()
 {
     QMutexLocker locker(&lock);
-    shouldRun = false;
+    canRun = false;
 }
 
 void FaceDeteThread::run()
 {
+
+
     while (1) {
 
         {
             QMutexLocker locker(&lock);
-            if (!shouldRun) {
+            if (!canRun) {
                 return ;
             }
         }
@@ -28,12 +31,21 @@ void FaceDeteThread::run()
 #ifdef DEBUG_FACE
     qDebug() << "FaceDeteThread | detecting...";
 #endif
+
         if (facedete->DetectFaces(mat, detectedResult)) {
             qDebug() << "something is wrong while detecting";
         }
+
 #ifdef DEBUG_FACE
         qDebug() << "FaceDeteThread | detection finished";
 #endif
+
+        if (detectedResult.empty()) {
+            emit DetectFinished({"null", "", "", {0, 0, 0, 0}});
+            return;
+        }
+
+
         for (unsigned int i = 0; i < detectedResult.size(); i ++) {
             Json::Value currRes = detectedResult[std::to_string(i)];
 
@@ -46,16 +58,7 @@ void FaceDeteThread::run()
                                                 currRes["rect"][2].asInt(),
                                                 currRes["rect"][3].asInt()}});
         }
-
         detectedResult.clear();
-
-        qRegisterMetaType<Student>("Student");
-
-        if (result.empty()) {
-            emit DetectFinished({"null", "", "", {0, 0, 0, 0}});
-            return;
-        }
-
 
         // TODO: 人脸识别结果大于1的情况
         if (result.size() > 1) {
@@ -63,60 +66,31 @@ void FaceDeteThread::run()
         }
 
         emit DetectFinished(result.front());
-
-//        {
-//            QMutexLocker locker(&lock);
-//            if (!shouldRun) {
-//                return ;
-//            }
-//        }
-
-
     }
-
-
-#ifdef DEBUG
-        qDebug() << "successfully generaged detection result";
-#endif
 }
 
 void FaceDeteThread::CanRun()
 {
     QMutexLocker locker(&lock);
-    shouldRun = true;
+    canRun = true;
 }
 
-void FaceDeteThread::ReceiveImg(const QImage& _img)
+void FaceDeteThread::ReceiveImg(const QImage& image)
 {
 #ifdef DEBUG_FACE
-    qDebug() << "FaceDeteThread | received image";
+    qDebug() << "FaceDeteThread | received image, " << image.format();
 #endif
 
-    switch (_img.format()) {
-    case QImage::Format_ARGB32:
-    case QImage::Format_RGB32:
-    case QImage::Format_ARGB32_Premultiplied:
-#ifdef DEBUG_FACE
-    qDebug() << "FaceDeteThread | convert image from ARGB32 to BGR";
-#endif
-        mat = cv::Mat(_img.height(), _img.width(), CV_8UC4, (void*)_img.constBits(), _img.bytesPerLine());
-        cv::cvtColor(mat,mat,COLOR_RGBA2BGR);
-        break;
-    case QImage::Format_RGB888:
-#ifdef DEBUG_FACE
-    qDebug() << "FaceDeteThread | convert image from RGB888 to BGR888";
-#endif
-        mat = cv::Mat(_img.height(), _img.width(), CV_8UC3, (void*)_img.constBits(), _img.bytesPerLine());
-        cv::cvtColor(mat, mat, CV_RGB2BGR);
-        break;
-    default:
-        qDebug() << "FaceDeteThread | " << _img.format();
-        break;
-    }
+    cv::Mat mat_tmp = cv::Mat(image.height(), image.width(), CV_8UC4, const_cast<uchar*>(image.bits()), image.bytesPerLine());
+    mat = cv::Mat(mat_tmp.rows, mat_tmp.cols, CV_8UC3 );
+    int from_to[] = { 0,0, 1,1, 2,2 };
+    cv::mixChannels( &mat_tmp, 1, &mat, 1, from_to, 3 );
+
 
 #ifdef DEBUG_FACE
     qDebug() << "FaceDeteThread | convert image successfully";
     qDebug() << "FaceDeteThread | " << cv::typeToString(mat.type()).c_str();
 #endif
-
+//    cv::imshow("debug", mat);
+    cv::imwrite("C:\\Users\\haoha\\Pictures\\mat.png", mat);
 }

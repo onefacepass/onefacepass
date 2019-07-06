@@ -43,8 +43,6 @@ private:
     void displayLogOnCamera(const QString& log);
     void debugFunc();           // TODO
 
-    cv::Mat QImage2Mat(QImage src);
-    int faceRect[4];
 
 private slots:
     void initForm();
