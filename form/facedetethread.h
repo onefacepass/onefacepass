@@ -1,0 +1,4 @@
+#ifndef FACEDETETHREAD_H
+#define FACEDETETHREAD_H
+
+#endif // FACEDETETHREAD_H
