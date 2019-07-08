@@ -6,14 +6,11 @@
 #include <QString>
 
 
-// TODO: q_log 会有竞争问题么？？？？
 
 class CameraViewfinder : public QCameraViewfinder
 {
 private:
-    QQueue<QString> q_log;
     QVector<QRect> rects;
-    bool is_camera_running = true;
 
 protected:
     void paintEvent(QPaintEvent *e);
@@ -21,10 +18,6 @@ protected:
 public:
     CameraViewfinder(QWidget *parent = nullptr);
     ~CameraViewfinder();
-
-    void insertLog(const QString& log);
-    void startCamera();
-    void stopCamera();
 
     void ReceiveRects(QVector<QRect> rects);
 };
