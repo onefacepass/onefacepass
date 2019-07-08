@@ -18,13 +18,7 @@ QUICreator::QUICreator(QWidget *parent) :
 QUICreator::~QUICreator()
 {
     delete ui;
-    if (facedete) {
-        facedete->UninitEngine();
 
-        delete facedete;
-        facedete = nullptr;
-    }
-//    captureThread->s
 }
 
 void QUICreator::initForm()
@@ -55,21 +49,41 @@ void QUICreator::initAction()
 
 void QUICreator::initFace()
 {
-    facedete = new FaceDete();
+    faceThread = new FaceDeteThread();
+    faceThread->CanRun();
+    connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::faceDetectFinished);
+    connect(faceThread, &FaceDeteThread::TrackFinished, this, &QUICreator::faceTrackFinished);
+    connect(faceThread, &FaceDeteThread::DetectFinishedWihoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
+    connect(faceThread, &FaceDeteThread::TrackFinishedWithoutResult, this, &QUICreator::faceTrackFinishedWithoutResult);
+}
 
-    facedete->SetAPPID("a4e18xLPPvPkB76rXtYM5GVraNduE3Q7vUnGPFLfhSj");
-    facedete->SetSDKKey("Fbu8Y5KNdMGpph8MrJc4GWceasdTeoGuCx3Qd4oRP6vs");
-    facedete->GetVersion();
-    facedete->Activation();
-    facedete->InitEngine();
+void QUICreator::faceTrackFinished(QVector<QRect> res)
+{
+    faceThread->StopImmediately();
 
-    facedete->SetPreloadPath("C:\\Workspace\\onefacepass\\sample");
+    ui->viewfinder->ReceiveRects(res);
+    ui->viewfinder->update();
+}
 
-    if (facedete->Loadregface() == -1) {
-        QUIWidget::showMessageBoxError("Error path!");
+void QUICreator::faceDetectFinished(QList<Student> res)
+{
+    qDebug() << "detect finished";
+    faceThread->StopImmediately();
+    for(auto r : res) {
+        qDebug() << r.identifiable << r.id << "\t" << r.name << "\t" << r.major;
     }
+}
+
+void QUICreator::faceTrackFinishedWithoutResult()
+{
 
 }
+
+void QUICreator::faceDetectFinishedWithoutResult()
+{
+
+}
+
 
 // 加载历史记录
 void QUICreator::initHistoryWidget()
@@ -128,14 +142,6 @@ void QUICreator::initNav()
 
 void QUICreator::initOther()
 {
-
-    faceThread = new FaceDeteThread();
-    faceThread->CanRun();
-//    connect(faceThread, &QThread::finished, faceThread, &QObject::deleteLater);
-    connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::debug_show_detect_result);
-
-//    QThreadPool::globalInstance()->setMaxThreadCount(8);
-
     ui->checkboxFace->setChecked(false);
     ui->checkboxPose->setChecked(false);
     ui->checkboxLog->setChecked(false);
@@ -154,7 +160,6 @@ void QUICreator::initOther()
 
     connect(ui->btnPay, &QPushButton::clicked, this, &QUICreator::btnPayClicked);
 
-
     debugFunc();
 }
 
@@ -169,7 +174,7 @@ void QUICreator::about()
 void QUICreator::initCamera()
 {
     captureThread = new CaptureThread();
-    connect(captureThread, &QThread::finished, captureThread, &QObject::deleteLater);
+//    connect(captureThread, &QThread::finished, captureThread, &QObject::deleteLater);
 
     // 加载“设备”菜单：后面现场调试时，可能电脑上会有多个摄像头设备吧！
     QActionGroup *videoDevicesGroup = new QActionGroup(this);
@@ -186,29 +191,21 @@ void QUICreator::initCamera()
     }
 
     connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
-    connect(ui->checkboxCamera, &QCheckBox::stateChanged, this, &QUICreator::startAndStopCamera);
 
     setCamera(QCameraInfo::defaultCamera());
-    ui->checkboxCamera->setChecked(true);
+
 
     connect(captureThread, &CaptureThread::CaptureNotice, this, &QUICreator::takeImage);
+
+    connect(captureThread, &CaptureThread::DetectFaceNotice, this, &QUICreator::doFaceDetect);
+    connect(captureThread, &CaptureThread::TrackFaceNotice, this, &QUICreator::doFaceTrack);
+
     captureThread->start();
 }
 
 void QUICreator::takeImage()
 {
     imageCapture->capture();
-}
-
-void QUICreator::startAndStopCamera()
-{
-    if (ui->checkboxCamera->isChecked()) {
-        camera->start();
-        ui->viewfinder->startCamera();
-    } else {
-        camera->stop();
-        ui->viewfinder->stopCamera();
-    }
 }
 
 // 切换摄像头
@@ -221,6 +218,7 @@ void QUICreator::updateCamera(QAction *action)
 void QUICreator::setCamera(const QCameraInfo &cameraInfo)
 {
     camera.reset(new QCamera(cameraInfo));
+
     imageCapture.reset(new QCameraImageCapture(camera.data()));
 
     connect(camera.data(), QOverload<QCamera::Error>::of(&QCamera::error), this, &QUICreator::displayCameraError);
@@ -239,27 +237,52 @@ void QUICreator::setCamera(const QCameraInfo &cameraInfo)
     camera->setViewfinder(ui->viewfinder);
 
     camera->start();
+
+    // 设置摄像头分辨率
+    QCameraViewfinderSettings set;
+    set.setResolution(640, 480);
+    camera->setViewfinderSettings(set);
+}
+
+
+void QUICreator::doFaceDetect()
+{
+    if (faceThread->isRunning()) {
+        return;
+    }
+
+    if (this->img_tmp.isNull()) {
+        return;
+    }
+
+    faceThread->ReceiveImg(true, this->img_tmp);
+    faceThread->CanRun();
+
+    faceThread->start();
+}
+
+void QUICreator::doFaceTrack()
+{
+    if (faceThread->isRunning()) {
+        return;
+    }
+
+    if (this->img_tmp.isNull()) {
+        return;
+    }
+
+
+    faceThread->ReceiveImg(false, this->img_tmp);
+    faceThread->CanRun();
+
+    faceThread->start();
 }
 
 void QUICreator::processCapturedImage(int requestId, const QImage& _img)
 {
     Q_UNUSED(requestId)
 
-//    qDebug() << _img.format();
-
-//    QImage img = _img.convertToFormat(QImage::Format_BGR30);
-
-    if (faceThread->isRunning()) {
-        return;
-    }
-
-    faceThread->CanRun();
-
-    faceThread->ReceiveImg(_img);
-
-
-    faceThread->start();
-
+    this->img_tmp = _img;
 }
 
 void QUICreator::debug_show_detect_result(Student res)
@@ -270,9 +293,9 @@ void QUICreator::debug_show_detect_result(Student res)
 //        qDebug() << "\033[31m" << "QUICreator | no detect result" << "\033[0m";
         return;
     }
-    qDebug()<< "\033[32m" << res.id << "\t" << res.name << "\t" << res.major
-             << "[" << res.faceRect[0] << " " << res.faceRect[1] << " " << res.faceRect[2] << " " << res.faceRect[3] << "]" << "\033[0m";
+    qDebug()<< "\033[32m" << res.id << "\t" << res.name << "\t" << res.major;
 }
+
 
 void QUICreator::displayCameraError()
 {
@@ -394,4 +417,14 @@ void QUICreator::btnPayClicked()
 {
     // 是不是要在这里验证身份
     takeImage();
+}
+
+
+void QUICreator::debug_show_supported_viewfinder_resolutions()
+{
+    QList<QSize> size = camera->supportedViewfinderResolutions();
+    qDebug() << "supportedViewfinderResolutions" << size.length();
+    for (auto s : size) {
+        qDebug() << s.width() << " " << s.height();
+    }
 }

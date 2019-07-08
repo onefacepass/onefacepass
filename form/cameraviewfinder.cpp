@@ -32,7 +32,10 @@ void CameraViewfinder::paintEvent(QPaintEvent *e)
     }
 
     painter.setPen(Qt::red);
-    painter.drawRect(rect[0], rect[1], rect[2],  rect[3]);
+
+    painter.drawRects(rects);
+
+//    painter.drawRect(rect[0], rect[1], rect[2]-rect[0],  rect[3]-rect[1]);
 
     if (!q_log.empty()) {
         QString log = this->q_log.dequeue();
@@ -57,8 +60,9 @@ void CameraViewfinder::stopCamera()
     this->is_camera_running = false;
 }
 
-void CameraViewfinder::ReceiveRect(int *r)
+void CameraViewfinder::ReceiveRects(QVector<QRect> _rects)
 {
-    memcpy_s(rect, 4*sizeof (int), r, 4*sizeof (int));
+    rects.clear();
+    rects.append(_rects);
 }
 

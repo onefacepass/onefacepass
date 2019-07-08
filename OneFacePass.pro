@@ -11,7 +11,7 @@ DESTDIR         = $$PWD/bin
 PRECOMPILED_HEADER  = head.h
 
 DEFINES +=  DEBUG=\\\"true\\\"
-DEFINES +=  DEBUG_FACE=\\\"true\\\"
+#DEFINES +=  DEBUG_FACE=\\\"true\\\"
 
 
 INCLUDEPATH     +=  $$PWD        \
@@ -37,6 +37,7 @@ SOURCES += main.cpp\
     form/quiwidget.cpp \
     form/quicreator.cpp \
     form/appinit.cpp
+#    form/FaceTrackThread.cpp
 
 
 
@@ -47,6 +48,7 @@ HEADERS  += head.h\
     form/quiwidget.h \
     form/quicreator.h \
     form/appinit.h
+#    form/FaceTrackThread.h
 
 
 

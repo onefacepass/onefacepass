@@ -30,11 +30,11 @@ public:
 
 private:
     Ui::QUICreator *ui;
+    QImage img_tmp;
 
     QScopedPointer<QCamera> camera;
     QScopedPointer<QCameraImageCapture> imageCapture;
 
-    FaceDete* facedete;
     CaptureThread *captureThread;
     FaceDeteThread *faceThread;
 
@@ -42,6 +42,9 @@ private:
     void insertLog(const QString& log);
     void displayLogOnCamera(const QString& log);
     void debugFunc();           // TODO
+
+    // 打印摄像头支持的分辨率
+    void debug_show_supported_viewfinder_resolutions();
 
 
 private slots:
@@ -53,10 +56,11 @@ private slots:
     void initFace();
     void initOther();
 
-    void startAndStopCamera();
     void setStyle(const QString &str);
     void takeImage();
     void processCapturedImage(int requestId, const QImage& img);
+    void doFaceDetect();
+    void doFaceTrack();
 
     void setCamera(const QCameraInfo &camera_info);
     void updateCamera(QAction *action);
@@ -70,6 +74,10 @@ private slots:
     void about();
 
     void debug_show_detect_result(Student res);
+    void faceDetectFinished(QList<Student> res);
+    void faceTrackFinished(QVector<QRect> res);
+    void faceDetectFinishedWithoutResult();
+    void faceTrackFinishedWithoutResult();
 };
 
 #endif // QUICREATOR_H
