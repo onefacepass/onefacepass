@@ -47,6 +47,9 @@ void QUICreator::initAction()
     ui->menuHelp->addAction(actionAbout);
 }
 
+/*
+ * @func: 初始化负责人脸识别的进程
+ */
 void QUICreator::initFace()
 {
     faceThread = new FaceDeteThread();
@@ -57,6 +60,10 @@ void QUICreator::initFace()
     connect(faceThread, &FaceDeteThread::TrackFinishedWithoutResult, this, &QUICreator::faceTrackFinishedWithoutResult);
 }
 
+/*
+ * @func: 处理人脸追踪结果：通知viewfinder画人脸框
+ * @res: 人脸的范围坐标，可能是多个人脸
+ */
 void QUICreator::faceTrackFinished(QVector<QRect> res)
 {
     faceThread->StopImmediately();
@@ -65,6 +72,10 @@ void QUICreator::faceTrackFinished(QVector<QRect> res)
     ui->viewfinder->update();
 }
 
+/*
+ * @func: 处理人脸识别结果
+ * @res: 由 FaceDetectThread::faceDetectFinished 发送过来的一组 Student
+ */
 void QUICreator::faceDetectFinished(QVector<Student> res)
 {
     qDebug() << "detect finished";
@@ -84,6 +95,9 @@ void QUICreator::faceDetectFinishedWithoutResult()
 
 }
 
+/*
+ * @func: 初始化竖直导航栏
+ */
 void QUICreator::initNav()
 {
     //设置左边按钮菜单
@@ -98,13 +112,14 @@ void QUICreator::initNav()
 
 void QUICreator::initOther()
 {
-    ui->checkboxFace->setChecked(false);
+    // 启用人脸跟踪，当前该设置项不生效
+    ui->checkboxFace->setChecked(true);
+    // 显示姿势轮廓，当前该设置项不生效
     ui->checkboxPose->setChecked(false);
+    // 向UI中更新日志，当前该设置项不生效
     ui->checkboxLog->setChecked(false);
 
-
     ui->widgetVerticalMenu->setProperty("nav", "left");
-//    ui->widgetBottom->setProperty("form", "bottom");
     ui->widgetTop->setProperty("nav", "top");
 
     ui->centralwidget->findChild<QWidget *>("widgetVideo")->setProperty("video", true);
@@ -115,8 +130,6 @@ void QUICreator::initOther()
     connect(ui->btnResetPay, &QPushButton::clicked, this, &QUICreator::resetConsumption);
 
     connect(ui->btnPay, &QPushButton::clicked, this, &QUICreator::btnPayClicked);
-
-    debugFunc();
 }
 
 void QUICreator::about()
@@ -126,13 +139,16 @@ void QUICreator::about()
 //    QMessageBox::about(this, tr("关于一脸通"), tr("关于一脸通"));
 }
 
-// 加载摄像头
+/*
+ * @func: 初始化摄像头
+ */
 void QUICreator::initCamera()
 {
     captureThread = new CaptureThread();
 //    connect(captureThread, &QThread::finished, captureThread, &QObject::deleteLater);
 
     // 加载“设备”菜单：后面现场调试时，可能电脑上会有多个摄像头设备吧！
+    // TODO: 当前多摄像设备的支持是有Bug的，后续再考虑修复Bug或者删除该支持
     QActionGroup *videoDevicesGroup = new QActionGroup(this);
     videoDevicesGroup->setExclusive(true);
     const QList<QCameraInfo> availableCameras = QCameraInfo::availableCameras();
@@ -148,6 +164,7 @@ void QUICreator::initCamera()
 
     connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
 
+    // 使用默认摄像头
     setCamera(QCameraInfo::defaultCamera());
 
 
@@ -159,18 +176,25 @@ void QUICreator::initCamera()
     captureThread->start();
 }
 
+/*
+ * @func: 对视频流进行截图，这里会触发QCameraImageCapture::imageCaptured信号
+ */
 void QUICreator::takeImage()
 {
     imageCapture->capture();
 }
 
-// 切换摄像头
+/*
+ * @func: 切换摄像头
+ */
 void QUICreator::updateCamera(QAction *action)
 {
     QUICreator::setCamera(qvariant_cast<QCameraInfo>(action->data()));
 }
 
-// 设置当前使用的摄像头
+/*
+ * @func: 设置当前摄像头
+ */
 void QUICreator::setCamera(const QCameraInfo &cameraInfo)
 {
     camera.reset(new QCamera(cameraInfo));
@@ -200,7 +224,9 @@ void QUICreator::setCamera(const QCameraInfo &cameraInfo)
     camera->setViewfinderSettings(set);
 }
 
-
+/*
+ * @func: 通知线程进行人脸识别
+ */
 void QUICreator::doFaceDetect()
 {
     if (faceThread->isRunning()) {
@@ -217,6 +243,9 @@ void QUICreator::doFaceDetect()
     faceThread->start();
 }
 
+/*
+ * @func: 通知线程进行人脸跟踪
+ */
 void QUICreator::doFaceTrack()
 {
     if (faceThread->isRunning()) {
@@ -234,6 +263,9 @@ void QUICreator::doFaceTrack()
     faceThread->start();
 }
 
+/*
+ * @func: 触发支付按钮后的动作放这里
+ */
 void QUICreator::processCapturedImage(int requestId, const QImage& _img)
 {
     Q_UNUSED(requestId)
@@ -241,16 +273,7 @@ void QUICreator::processCapturedImage(int requestId, const QImage& _img)
     this->img_tmp = _img;
 }
 
-void QUICreator::debug_show_detect_result(Student res)
-{
-    faceThread->StopImmediately();
 
-    if (res.id == "null") {
-//        qDebug() << "\033[31m" << "QUICreator | no detect result" << "\033[0m";
-        return;
-    }
-    qDebug()<< "\033[32m" << res.id << "\t" << res.name << "\t" << res.major;
-}
 
 
 void QUICreator::displayCameraError()
@@ -259,7 +282,9 @@ void QUICreator::displayCameraError()
 }
 
 
-
+/*
+ * @func: 竖直导航栏的菜单切换
+ */
 void QUICreator::navBtnClicked()
 {
     QPushButton *btn = static_cast<QPushButton*>(sender());
@@ -314,22 +339,8 @@ void QUICreator::setStyle(const QString &str)
     qApp->setStyleSheet(str);
 }
 
-/* @func: 在摄像头图像上显示日志，可能会有不到1s的延迟
- * @log: 要显示的日志
- */
-void QUICreator::displayLogOnCamera(const QString &log)
-{
-    ui->viewfinder->insertLog(log);
-}
-
-void QUICreator::debugFunc()
-{
-    insertLog("log1");
-    insertLog("log2");
-    insertLog("log3");
-}
-
-/* @func: 向调试界面插入一条日志
+/*
+ * @func: 向调试界面插入一条日志
  * @str: 待插入的日志，无需关注结尾是否有'\n'
  */
 void QUICreator::insertLog(const QString& str)
@@ -367,14 +378,19 @@ void QUICreator::btnReadyPayClicked()
 }
 
 
-/* @func: 触发支付按钮后的动作放这里
+/*
+ * @func: 触发支付按钮后的动作放这里
  */
 void QUICreator::btnPayClicked()
 {
     // 是不是要在这里验证身份
-    takeImage();
+    // takeImage();
 }
 
+
+/*********************************************************
+ *                      调试专用                          *
+ *********************************************************/
 
 void QUICreator::debug_show_supported_viewfinder_resolutions()
 {
@@ -383,4 +399,9 @@ void QUICreator::debug_show_supported_viewfinder_resolutions()
     for (auto s : size) {
         qDebug() << s.width() << " " << s.height();
     }
+}
+
+void QUICreator::debug_show_student_info(Student s)
+{
+    qDebug()<< "\033[32m" << s.identifiable << s.id << "\t" << s.name << "\t" << s.major << s.path;
 }

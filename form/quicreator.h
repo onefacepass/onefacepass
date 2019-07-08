@@ -40,11 +40,10 @@ private:
 
 private:
     void insertLog(const QString& log);
-    void displayLogOnCamera(const QString& log);
-    void debugFunc();           // TODO
 
     // 打印摄像头支持的分辨率
     void debug_show_supported_viewfinder_resolutions();
+    void debug_show_student_info(Student s);
 
 
 private slots:
@@ -72,7 +71,6 @@ private slots:
     void initStyle();
     void about();
 
-    void debug_show_detect_result(Student res);
     void faceDetectFinished(QVector<Student> res);
     void faceTrackFinished(QVector<QRect> res);
     void faceDetectFinishedWithoutResult();
