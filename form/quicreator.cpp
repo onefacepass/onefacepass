@@ -140,29 +140,29 @@ void QUICreator::about()
 }
 
 /*
- * @func: 初始化摄像头
+ * @func: 初始化摄像头 & 初始化负载对视频流截图的进程
  */
 void QUICreator::initCamera()
 {
     captureThread = new CaptureThread();
 //    connect(captureThread, &QThread::finished, captureThread, &QObject::deleteLater);
 
-    // 加载“设备”菜单：后面现场调试时，可能电脑上会有多个摄像头设备吧！
-    // TODO: 当前多摄像设备的支持是有Bug的，后续再考虑修复Bug或者删除该支持
-    QActionGroup *videoDevicesGroup = new QActionGroup(this);
-    videoDevicesGroup->setExclusive(true);
-    const QList<QCameraInfo> availableCameras = QCameraInfo::availableCameras();
-    for (const QCameraInfo &cameraInfo : availableCameras) {
-        QAction *videoDeviceAction = new QAction(cameraInfo.description(), videoDevicesGroup);
-        videoDeviceAction->setCheckable(true);
-        videoDeviceAction->setData(QVariant::fromValue(cameraInfo));
-        if (cameraInfo == QCameraInfo::defaultCamera())
-            videoDeviceAction->setChecked(true);
+// 加载“设备”菜单：后面现场调试时，可能电脑上会有多个摄像头设备吧！
+// TODO: 当前多摄像设备的支持是有Bug的，后续再考虑修复Bug或者删除该支持
+//    QActionGroup *videoDevicesGroup = new QActionGroup(this);
+//    videoDevicesGroup->setExclusive(true);
+//    const QList<QCameraInfo> availableCameras = QCameraInfo::availableCameras();
+//    for (const QCameraInfo &cameraInfo : availableCameras) {
+//        QAction *videoDeviceAction = new QAction(cameraInfo.description(), videoDevicesGroup);
+//        videoDeviceAction->setCheckable(true);
+//        videoDeviceAction->setData(QVariant::fromValue(cameraInfo));
+//        if (cameraInfo == QCameraInfo::defaultCamera())
+//            videoDeviceAction->setChecked(true);
 
-        ui->menuDevice->addAction(videoDeviceAction);
-    }
+//        ui->menuDevice->addAction(videoDeviceAction);
+//    }
 
-    connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
+//    connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
 
     // 使用默认摄像头
     setCamera(QCameraInfo::defaultCamera());
@@ -177,7 +177,8 @@ void QUICreator::initCamera()
 }
 
 /*
- * @func: 对视频流进行截图，这里会触发QCameraImageCapture::imageCaptured信号
+ * @func: 对视频流进行截图
+ *        这里会触发QCameraImageCapture::imageCaptured信号
  */
 void QUICreator::takeImage()
 {
@@ -264,7 +265,9 @@ void QUICreator::doFaceTrack()
 }
 
 /*
- * @func: 触发支付按钮后的动作放这里
+ * @func:       处理 takeImage 发送的信号
+ * @requestId:  这是一个递增的序列，是QCameraCapture中实现的，当前没用
+ * @_img:       截取的一帧视频流
  */
 void QUICreator::processCapturedImage(int requestId, const QImage& _img)
 {
