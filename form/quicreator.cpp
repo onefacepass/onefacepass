@@ -12,6 +12,7 @@ QUICreator::QUICreator(QWidget *parent) :
 
     ui->setupUi(this);
     this->initForm();
+
     this->initFace();
 }
 
@@ -23,7 +24,6 @@ QUICreator::~QUICreator()
 
 void QUICreator::initForm()
 {
-    initHistoryWidget();
     initAction();
     initNav();
 
@@ -65,7 +65,7 @@ void QUICreator::faceTrackFinished(QVector<QRect> res)
     ui->viewfinder->update();
 }
 
-void QUICreator::faceDetectFinished(QList<Student> res)
+void QUICreator::faceDetectFinished(QVector<Student> res)
 {
     qDebug() << "detect finished";
     faceThread->StopImmediately();
@@ -82,50 +82,6 @@ void QUICreator::faceTrackFinishedWithoutResult()
 void QUICreator::faceDetectFinishedWithoutResult()
 {
 
-}
-
-
-// 加载历史记录
-void QUICreator::initHistoryWidget()
-{
-    //设置列数和列宽
-    int width = qApp->desktop()->availableGeometry().width() - 120;
-    ui->historyTableWidget->setColumnCount(5);
-    ui->historyTableWidget->setColumnWidth(0, static_cast<int>(width * 0.06));
-    ui->historyTableWidget->setColumnWidth(1, static_cast<int>(width * 0.04));
-    ui->historyTableWidget->setColumnWidth(2, static_cast<int>(width * 0.08));
-    ui->historyTableWidget->setColumnWidth(3, static_cast<int>(width * 0.08));
-    ui->historyTableWidget->setColumnWidth(4, static_cast<int>(width * 0.08));
-    ui->historyTableWidget->verticalHeader()->setDefaultSectionSize(25);
-
-    QStringList headText;
-    headText << "学号" << "姓名" << "学院" << "专业" << "上次见面";
-    ui->historyTableWidget->setHorizontalHeaderLabels(headText);
-    ui->historyTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->historyTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->historyTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->historyTableWidget->setAlternatingRowColors(true);
-    ui->historyTableWidget->verticalHeader()->setVisible(false);
-    ui->historyTableWidget->horizontalHeader()->setStretchLastSection(true);
-
-    //设置行高
-    ui->historyTableWidget->setRowCount(10);
-
-    for (int i = 0; i < 10; i++) {
-        ui->historyTableWidget->setRowHeight(i, 24);
-
-        QTableWidgetItem *itemDeviceID = new QTableWidgetItem(QString::number(i + 1));
-        QTableWidgetItem *itemDeviceName = new QTableWidgetItem(QString("名字%1").arg(i + 1));
-        QTableWidgetItem *itemDeviceAddr = new QTableWidgetItem(QString("学院%1").arg(i + 1));
-        QTableWidgetItem *itemContent = new QTableWidgetItem(QString("专业%1").arg(i + 1));
-        QTableWidgetItem *itemTime = new QTableWidgetItem(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-
-        ui->historyTableWidget->setItem(i, 0, itemDeviceID);
-        ui->historyTableWidget->setItem(i, 1, itemDeviceName);
-        ui->historyTableWidget->setItem(i, 2, itemDeviceAddr);
-        ui->historyTableWidget->setItem(i, 3, itemContent);
-        ui->historyTableWidget->setItem(i, 4, itemTime);
-    }
 }
 
 void QUICreator::initNav()

@@ -50,7 +50,6 @@ private:
 private slots:
     void initForm();
     void initCamera();
-    void initHistoryWidget();
     void initNav();
     void initAction();
     void initFace();
@@ -74,7 +73,7 @@ private slots:
     void about();
 
     void debug_show_detect_result(Student res);
-    void faceDetectFinished(QList<Student> res);
+    void faceDetectFinished(QVector<Student> res);
     void faceTrackFinished(QVector<QRect> res);
     void faceDetectFinishedWithoutResult();
     void faceTrackFinishedWithoutResult();
