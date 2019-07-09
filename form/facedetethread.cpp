@@ -3,11 +3,11 @@
 #include "facedetethread.h"
 
 
-FaceDeteThread::FaceDeteThread() : canRun(true), detect(false)
+FaceDeteThread::FaceDeteThread(const QString& photoPath) : canRun(true), detect(false)
 {
     facedete = new FaceDete();
 
-    facedete->SetPreloadPath("C:\\Workspace\\onefacepass\\sample");
+    facedete->SetPreloadPath(photoPath.toStdString());
 
     if (facedete->Loadregface() == 0) {
         qDebug() << "\033[31m" << "FaceDeteThread | facedete->Loadregface() == 0" << "\033[0m";

@@ -25,7 +25,7 @@ class FaceDeteThread :  public QThread
 {
     Q_OBJECT
 public:
-    FaceDeteThread();
+    FaceDeteThread(const QString& photoPath);
 
 private:
     FaceDete* facedete;

@@ -9,5 +9,6 @@
         <file>image/qt_zh_CN.qm</file>
         <file>main.ico</file>
         <file>image/widgets.qm</file>
+        <file>config.ini</file>
     </qresource>
 </RCC>

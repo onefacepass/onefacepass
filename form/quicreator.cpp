@@ -5,12 +5,15 @@
 
 Q_DECLARE_METATYPE(QCameraInfo)
 
-QUICreator::QUICreator(QWidget *parent) :
+QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
     QMainWindow(parent),
     ui(new Ui::QUICreator)
 {
 
     ui->setupUi(this);
+
+    config = new QSettings(config_file, QSettings::IniFormat);
+
     this->initForm();
 
     this->initFace();
@@ -52,7 +55,8 @@ void QUICreator::initAction()
  */
 void QUICreator::initFace()
 {
-    faceThread = new FaceDeteThread();
+    qDebug() << config->value("FaceDetect/photo_path").toString();
+    faceThread = new FaceDeteThread(config->value("FaceDetect/photo_path").toString());
     faceThread->CanRun();
     connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceDeteThread::TrackFinished, this, &QUICreator::faceTrackFinished);
@@ -388,7 +392,6 @@ void QUICreator::btnPayClicked()
     // 是不是要在这里验证身份
     // takeImage();
 }
-
 
 /*********************************************************
  *                      调试专用                          *
