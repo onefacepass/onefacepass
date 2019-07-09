@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     form/facedetethread.cpp \
     form/quiwidget.cpp \
     form/quicreator.cpp \
-    form/appinit.cpp
+    form/appinit.cpp    \
+    form/stuwidget.cpp
 #    form/FaceTrackThread.cpp
 
 
@@ -47,13 +48,15 @@ HEADERS  += head.h\
     form/facedetethread.h \
     form/quiwidget.h \
     form/quicreator.h \
-    form/appinit.h
+    form/appinit.h  \
+    form/stuwidget.h
 #    form/FaceTrackThread.h
 
 
 
 FORMS    += \
-    form/quicreator.ui
+    form/quicreator.ui  \
+    form/stuwidget.ui
 
 
 RESOURCES += \
