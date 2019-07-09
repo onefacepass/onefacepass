@@ -13,6 +13,8 @@ protected:
 
 signals:
     void CaptureNotice();
+    void DetectFaceNotice();
+    void TrackFaceNotice();
 };
 
 #endif // CAPTURETHREAD_H

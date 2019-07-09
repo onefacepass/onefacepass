@@ -3,18 +3,19 @@
 
 #include <QMutex>
 #include <QImage>
-#include <QList>
-//#include <QRunnable>
-//#include <QThreadPool>
+#include <QVector>
+#include <QRect>
 
 #include "FaceDete.h"
 
 
 typedef struct t_student {
+    bool identifiable;
     QString id;
     QString name;
     QString major;
-    int faceRect[4];
+    QRect faceRect;
+    QString path;
 } Student;
 
 
@@ -33,18 +34,23 @@ private:
     cv::Mat mat;
     int faceRect[4];
     bool canRun;
+    bool detect;
     Json::Value detectedResult;
-    QList<Student> result;
+    QVector<QRect> resultOnlyTrack;
+    QVector<Student> resultComplete;
 
 protected:
     void run();
 
 signals:
-    void DetectFinished(Student res);
+    void DetectFinished(QVector<Student> res);
     void DetectFinishedWihoutResult();
 
+    void TrackFinished(QVector<QRect> res);
+    void TrackFinishedWithoutResult();
+
 public slots:
-    void ReceiveImg(const QImage& _img);
+    void ReceiveImg(bool _detect, const QImage& image);
     void StopImmediately();
     void CanRun();
 };

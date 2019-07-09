@@ -3,10 +3,17 @@
 #include "facedetethread.h"
 
 
-FaceDeteThread::FaceDeteThread() : canRun(true)
+FaceDeteThread::FaceDeteThread() : canRun(true), detect(false)
 {
     facedete = new FaceDete();
+
+    facedete->SetPreloadPath("C:\\Workspace\\onefacepass\\sample");
+
+    if (facedete->Loadregface() == 0) {
+        qDebug() << "\033[31m" << "FaceDeteThread | facedete->Loadregface() == 0" << "\033[0m";
+    }
     qRegisterMetaType<Student>("Student");
+    qRegisterMetaType<QVector<QRect> >("QVector<QRect>");
 }
 
 void FaceDeteThread::StopImmediately()
@@ -17,9 +24,7 @@ void FaceDeteThread::StopImmediately()
 
 void FaceDeteThread::run()
 {
-
-
-    while (1) {
+//    while (1) {
 
         {
             QMutexLocker locker(&lock);
@@ -45,33 +50,47 @@ void FaceDeteThread::run()
         qDebug() << "\033[31m" << "FaceDeteThread | detectedResult empty! "
                  << detectedResult.size() << "\033[0m";
 #endif
-            emit DetectFinished({"null", "", "", {0, 0, 0, 0}});
-            // todo: emit DetectFinishedWithoutResult
+            if (detect)
+                emit DetectFinishedWihoutResult();
+            else
+                emit TrackFinishedWithoutResult();
+
             return;
         }
-
 
         for (unsigned int i = 0; i < detectedResult.size(); i ++) {
             Json::Value currRes = detectedResult[std::to_string(i)];
 
-            QString id(currRes["id"].asCString());
-            QString name(currRes["name"].asCString());
-            QString major(currRes["major"].asCString());
+            if (detect) {
+                QString id(currRes["id"].asCString());
+                QString name(currRes["name"].asCString());
+                QString major(currRes["major"].asCString());
+                bool identifiable = currRes["identifiable"].asBool();
+                QString path(currRes["pathInPreload"].asCString());
 
-            result.push_back({id, name, major, {currRes["rect"][0].asInt(),
-                                                currRes["rect"][1].asInt(),
-                                                currRes["rect"][2].asInt(),
-                                                currRes["rect"][3].asInt()}});
+                resultComplete.push_back({identifiable,
+                                          id,
+                                          name,
+                                          major,
+                                          QRect(currRes["rect"][0].asInt(), currRes["rect"][1].asInt(),
+                                                currRes["rect"][2].asInt()-currRes["rect"][0].asInt(), currRes["rect"][3].asInt()-currRes["rect"][1].asInt()),
+                                          path});
+            } else {
+                resultOnlyTrack.push_back(QRect(currRes["rect"][0].asInt(), currRes["rect"][1].asInt(),
+                        currRes["rect"][2].asInt()-currRes["rect"][0].asInt(), currRes["rect"][3].asInt()-currRes["rect"][1].asInt()));
+            }
         }
+
+        if (detect)
+            emit DetectFinished(resultComplete);
+        else
+            emit TrackFinished(resultOnlyTrack);
+
+
         detectedResult.clear();
-
-        // TODO: 人脸识别结果大于1的情况
-        if (result.size() > 1) {
-
-        }
-
-        emit DetectFinished(result.front());
-    }
+        resultComplete.clear();
+        resultOnlyTrack.clear();
+//    }
 }
 
 void FaceDeteThread::CanRun()
@@ -80,11 +99,13 @@ void FaceDeteThread::CanRun()
     canRun = true;
 }
 
-void FaceDeteThread::ReceiveImg(const QImage& image)
+void FaceDeteThread::ReceiveImg(bool _detect, const QImage& image)
 {
 #ifdef DEBUG_FACE
-    qDebug() << "FaceDeteThread | received image, " << image.format();
+    qDebug() << "FaceDeteThread | received image, " << image.format() <<", detect: " << _detect;
 #endif
+
+    detect = _detect;
 
     cv::Mat mat_tmp = cv::Mat(image.height(), image.width(), CV_8UC4, const_cast<uchar*>(image.bits()), image.bytesPerLine());
     mat = cv::Mat(mat_tmp.rows, mat_tmp.cols, CV_8UC3 );
@@ -93,9 +114,9 @@ void FaceDeteThread::ReceiveImg(const QImage& image)
 
 
 #ifdef DEBUG_FACE
-    qDebug() << "FaceDeteThread | convert image successfully";
-    qDebug() << "FaceDeteThread | " << cv::typeToString(mat.type()).c_str();
+    qDebug() << "FaceDeteThread | convert image successfully, "
+             << cv::typeToString(mat.type()).c_str();
+    //    cv::imshow("debug", mat);
+    //    cv::imwrite("C:\\Users\\haoha\\Pictures\\mat.png", mat);
 #endif
-//    cv::imshow("debug", mat);
-//    cv::imwrite("C:\\Users\\haoha\\Pictures\\mat.png", mat);
 }
