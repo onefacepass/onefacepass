@@ -14,6 +14,7 @@ FaceDeteThread::FaceDeteThread() : canRun(true), detect(false)
     }
     qRegisterMetaType<Student>("Student");
     qRegisterMetaType<QVector<QRect> >("QVector<QRect>");
+    qRegisterMetaType<QVector<Student> >("QVector<Student>");
 }
 
 void FaceDeteThread::StopImmediately()
