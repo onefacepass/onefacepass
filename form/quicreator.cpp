@@ -120,7 +120,7 @@ void QUICreator::initOther()
     ui->checkboxLog->setChecked(false);
 
     ui->widgetVerticalMenu->setProperty("nav", "left");
-    ui->widgetTop->setProperty("nav", "top");
+    ui->widgetPay->setProperty("nav", "top");
 
     ui->centralwidget->findChild<QWidget *>("widgetVideo")->setProperty("video", true);
 

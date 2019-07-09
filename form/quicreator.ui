@@ -309,7 +309,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QWidget" name="widget_2" native="true">
+         <widget class="QWidget" name="widgetResult" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -319,7 +319,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="widgetTop" native="true">
+         <widget class="QWidget" name="widgetPay" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="spacing">
             <number>0</number>
