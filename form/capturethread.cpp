@@ -15,10 +15,10 @@ void CaptureThread::run()
         i = i % 10 + 1;
         QThread::msleep(100);
 
-
-        emit TrackFaceNotice();
-
-        if (i % 10 == 0) emit DetectFaceNotice();
-
+        if (i % 10 != 0) {
+            emit TrackFaceNotice();
+        } else {
+            emit DetectFaceNotice();
+        }
     }
 }

@@ -257,7 +257,6 @@ void QUICreator::doFaceTrack()
         return;
     }
 
-
     faceThread->ReceiveImg(false, this->img_tmp);
     faceThread->CanRun();
 
