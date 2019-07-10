@@ -18,20 +18,20 @@ FaceDeteThread::FaceDeteThread(const QString& photoPath) : canRun(true), detect(
 
 void FaceDeteThread::StopImmediately()
 {
-    QMutexLocker locker(&lock);
-    canRun = false;
+//    QMutexLocker locker(&lock);
+//    canRun = false;
 }
 
 void FaceDeteThread::run()
 {
 //    while (1) {
 
-        {
-            QMutexLocker locker(&lock);
-            if (!canRun) {
-                return ;
-            }
-        }
+//        {
+//            QMutexLocker locker(&lock);
+//            if (!canRun) {
+//                return ;
+//            }
+//        }
 
 #ifdef DEBUG_FACE
     qDebug() << "FaceDeteThread | detecting...";
@@ -66,6 +66,8 @@ void FaceDeteThread::run()
                 QString major(currRes["major"].asString().data());
                 bool identifiable = currRes["identifiable"].asBool();
                 QString path(currRes["pathInPreload"].asString().data());
+
+                std::cerr << "xxx" << currRes["id"] << "\t" << currRes["identifiable"] << "\n";
 
                 // 检测模式下返回完整的人脸识别信息
                 resultComplete.push_back({identifiable,
