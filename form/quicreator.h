@@ -59,7 +59,7 @@ private slots:
     void initNav();
     void initAction();
     void initFace();
-    void initStudentWidget(QVector<std::shared_ptr<StuWidget>>* _stuWidgets);
+    void initStudentWidget();
     void initOther();
 
     void setStyle(const QString &str);
