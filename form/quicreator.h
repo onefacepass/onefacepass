@@ -9,6 +9,7 @@
 #include <QCameraInfo>
 #include <QSettings>
 
+#include "stuwidget.h"
 #include "FaceDete.h"
 #include "capturethread.h"
 #include "facedetethread.h"
@@ -31,6 +32,7 @@ public:
 
 
 private:
+    int MAX_RESULT = 5;
     Ui::QUICreator *ui;
     QImage img_tmp;
     QSettings *config;
@@ -40,6 +42,8 @@ private:
 
     CaptureThread *captureThread;
     FaceDeteThread *faceThread;
+
+    QVector<std::shared_ptr<StuWidget>> stuWidgets;
 
 private:
     void insertLog(const QString& log);
@@ -55,6 +59,7 @@ private slots:
     void initNav();
     void initAction();
     void initFace();
+    void initStudentWidget(QVector<std::shared_ptr<StuWidget>>* _stuWidgets);
     void initOther();
 
     void setStyle(const QString &str);

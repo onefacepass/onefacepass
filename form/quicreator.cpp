@@ -1,4 +1,6 @@
-﻿#include "quicreator.h"
+﻿#include <QtConcurrent>
+
+#include "quicreator.h"
 #include "ui_quicreator.h"
 #include "stuwidget.h"
 
@@ -44,6 +46,11 @@ void QUICreator::initForm()
 
     initStyle();
 
+    initStudentWidget(&stuWidgets);
+
+//    QtConcurrent::run(this, &QUICreator::initStudentWidget, &stuWidgets);
+
+
     ui->tabWidget->setCurrentIndex(0);
 }
 
@@ -75,65 +82,6 @@ void QUICreator::initFace()
     connect(faceThread, &FaceDeteThread::TrackFinishedWithoutResult, this, &QUICreator::faceTrackFinishedWithoutResult);
 }
 
-/*
- * @func: 处理人脸追踪结果：通知viewfinder画人脸框
- * @res: 人脸的范围坐标，可能是多个人脸
- */
-void QUICreator::faceTrackFinished(QVector<QRect> res)
-{
-    faceThread->StopImmediately();
-
-    ui->viewfinder->ReceiveRects(res);
-    ui->viewfinder->update();
-}
-
-/*
- * @func: 处理人脸识别结果
- * @res: 由 FaceDetectThread::faceDetectFinished 发送过来的一组 Student
- */
-void QUICreator::faceDetectFinished(QVector<Student> res)
-{
-    // 先停止识别线程
-    faceThread->StopImmediately();
-
-    // 清除UI上已经显示的识别结果
-    QLayoutItem* child;
-    while ((child = ui->resultHorizontalLayout->takeAt(0)) != nullptr) {
-        if (child->widget()) {
-            child->widget()->setParent(nullptr);
-        }
-        delete child;
-    }
-
-    // 向UI加载识别结果
-    StuWidget *widget;
-    for (auto r : res) {
-        if (!r.identifiable) {
-            continue;
-        }
-        widget = new StuWidget(this);
-        widget->setID(r.id);
-        widget->setName(r.name);
-        widget->setMajor(r.major);
-        widget->setPhoto(config->value("Debug/photo").toString());    // todo: 当前使用唯一的测试图片
-        ui->resultHorizontalLayout->addWidget(widget);
-    }
-
-
-    for(auto r : res) {
-        qDebug() << r.identifiable << r.id << "\t" << r.name << "\t" << r.major;
-    }
-}
-
-void QUICreator::faceTrackFinishedWithoutResult()
-{
-
-}
-
-void QUICreator::faceDetectFinishedWithoutResult()
-{
-
-}
 
 /*
  * @func: 初始化竖直导航栏
@@ -214,6 +162,14 @@ void QUICreator::initCamera()
     connect(captureThread, &CaptureThread::TrackFaceNotice, this, &QUICreator::doFaceTrack);
 
     captureThread->start();
+}
+
+void QUICreator::initStudentWidget(QVector<std::shared_ptr<StuWidget>>* _stuWidgets)
+{
+    // 预先加载用来展示结果的图形控件
+    for (int i = 0; i < MAX_RESULT; ++i) {
+        _stuWidgets->push_back(shared_ptr<StuWidget>(new StuWidget(this)));
+    }
 }
 
 /*
@@ -301,6 +257,70 @@ void QUICreator::doFaceTrack()
     faceThread->CanRun();
 
     faceThread->start();
+}
+
+
+/*
+ * @func: 处理人脸追踪结果：通知viewfinder画人脸框
+ * @res: 人脸的范围坐标，可能是多个人脸
+ */
+void QUICreator::faceTrackFinished(QVector<QRect> res)
+{
+    faceThread->StopImmediately();
+
+    ui->viewfinder->ReceiveRects(res);
+    ui->viewfinder->update();
+}
+
+/*
+ * @func: 处理人脸识别结果
+ * @res: 由 FaceDetectThread::faceDetectFinished 发送过来的一组 Student
+ */
+void QUICreator::faceDetectFinished(QVector<Student> res)
+{
+    // 先停止识别线程
+    faceThread->StopImmediately();
+
+    // 清除UI上已经显示的识别结果
+    QLayoutItem* child;
+    while ((child = ui->resultHorizontalLayout->takeAt(0)) != nullptr) {
+        if (child->widget()) {
+            child->widget()->setParent(nullptr);
+        }
+//        delete child;
+    }
+
+    // 向UI加载识别结果
+    for (int i = 0; i < res.size(); i ++) {
+        if (!res[i].identifiable)
+            continue;
+        if (i >= MAX_RESULT)
+            break;
+
+        stuWidgets[i]->setParent(this);
+        stuWidgets[i]->setID(res[i].id);
+        stuWidgets[i]->setName(res[i].name);
+        stuWidgets[i]->setMajor(res[i].major);
+        stuWidgets[i]->setPhoto(config->value("Debug/photo").toString());    // todo: 当前使用唯一的测试图片
+        ui->resultHorizontalLayout->addWidget(stuWidgets[i].get());
+    }
+
+
+    for(auto r : res) {
+        qDebug() << r.identifiable << r.id << "\t" << r.name << "\t" << r.major;
+    }
+}
+
+void QUICreator::faceTrackFinishedWithoutResult()
+{
+    // 先停止识别线程
+    faceThread->StopImmediately();
+}
+
+void QUICreator::faceDetectFinishedWithoutResult()
+{
+    // 先停止识别线程
+    faceThread->StopImmediately();
 }
 
 /*

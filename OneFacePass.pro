@@ -1,4 +1,4 @@
-QT       += core widgets gui network multimedia multimediawidgets
+QT       += core widgets gui network multimedia multimediawidgets concurrent
 
 TARGET          = OneFacePass
 TEMPLATE        = app
@@ -12,6 +12,7 @@ PRECOMPILED_HEADER  = head.h
 
 DEFINES +=  DEBUG=\\\"true\\\"
 #DEFINES +=  DEBUG_FACE=\\\"true\\\"
+DEFINES +=  DEBUG_THREAD=\\\"true\\\"
 
 
 INCLUDEPATH     +=  $$PWD        \
