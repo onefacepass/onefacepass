@@ -4,25 +4,24 @@
 #include <QWidget>
 
 namespace Ui {
-class stuWidget;
+class StuWidget;
 }
 
-class stuWidget : public QWidget
+class StuWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit stuWidget(QWidget *parent = 0);
-    ~stuWidget();
+    explicit StuWidget(QWidget *parent = 0);
+    ~StuWidget();
 
-    void setDeviceName(const QString &deviceName);
-    void setDeviceTemp(double tempValue);
-    void setDeviceDamp(double dampValue);
-    void setCountAll(int countAll);
-    void setCountNoRead(int countNoRead);
+    void setName(const QString &name);
+    void setID(const QString &id);
+    void setMajor(const QString &major);
+    void setPhoto(const QString &photo);
 
 private:
-    Ui::stuWidget *ui;
+    Ui::StuWidget *ui;
 };
 
 #endif // STUWIDGET_H

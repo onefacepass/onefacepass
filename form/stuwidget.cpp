@@ -2,11 +2,19 @@
 #include "ui_stuwidget.h"
 #include "qfontdatabase.h"
 
-stuWidget::stuWidget(QWidget *parent) :
+StuWidget::StuWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::stuWidget)
+    ui(new Ui::StuWidget)
 {
     ui->setupUi(this);
+
+
+    setFixedWidth(150);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+
+    ui->labPhoto->setAlignment(Qt::AlignCenter);
+    ui->labMajor->setAlignment(Qt::AlignCenter);
 
     //引入图形字体
     int fontId = QFontDatabase::addApplicationFont(":/image/fontawesome-webfont.ttf");
@@ -14,42 +22,37 @@ stuWidget::stuWidget(QWidget *parent) :
     QFont iconFont = QFont(fontName);
     iconFont.setPixelSize(15);
 
-    ui->labDevice->setFont(iconFont);
-    ui->labDevice->setText(QChar(0xf06c));
-
-    ui->labTemp->setFont(iconFont);
-    ui->labTemp->setText(QChar(0xf0eb));
-
-    ui->labDamp->setFont(iconFont);
-    ui->labDamp->setText(QChar(0xf043));
 }
 
-stuWidget::~stuWidget()
+StuWidget::~StuWidget()
 {
     delete ui;
 }
 
-void stuWidget::setDeviceName(const QString &deviceName)
+void StuWidget::setID(const QString &id)
 {
-    ui->labDeviceName->setText(deviceName);
+    ui->labID->setText(QString("学号: %1").arg(id));
+//    ui->labID->setText(id);
 }
 
-void stuWidget::setDeviceTemp(double tempValue)
+void StuWidget::setName(const QString &name)
 {
-    ui->labCurrentTemp->setText(QString("温度 : %1 ℃").arg(tempValue));
+    ui->labName->setText(QString("姓名: %1").arg(name));
+//    ui->labName->setText(name);
 }
 
-void stuWidget::setDeviceDamp(double dampValue)
+void StuWidget::setMajor(const QString &major)
 {
-    ui->labCurrentDamp->setText(QString("温度 : %1 %RH").arg(dampValue));
+    ui->labMajor->setText(major);
+//    ui->labMajor->setText(QString("专业: %1").arg(major));
 }
 
-void stuWidget::setCountAll(int countAll)
+void StuWidget::setPhoto(const QString &photo)
 {
-    ui->labCountAll->setText(QString("总条数 : %1").arg(countAll));
-}
+    QImage *pho = new QImage();
+    pho->load(photo);
+    *pho = pho->scaled(130,173);
 
-void stuWidget::setCountNoRead(int countNoRead)
-{
-    ui->labCountNoRead->setText(QString("未读数 : %1").arg(countNoRead));
+    ui->labPhoto->setPixmap(QPixmap::fromImage(*pho));
+
 }

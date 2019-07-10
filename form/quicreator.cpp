@@ -1,5 +1,6 @@
 ﻿#include "quicreator.h"
 #include "ui_quicreator.h"
+#include "stuwidget.h"
 
 #include "quiwidget.h"
 
@@ -17,6 +18,13 @@ QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
     this->initForm();
 
     this->initFace();
+
+    StuWidget* stu = new StuWidget(this);
+    stu->setID("null");
+    stu->setName("null");
+    stu->setMajor("null");
+    stu->setPhoto("C:/Workspace/onefacepass/sample/4.jpg");
+    ui->resultHorizontalLayout->addWidget(stu);
 }
 
 QUICreator::~QUICreator()
@@ -55,8 +63,11 @@ void QUICreator::initAction()
  */
 void QUICreator::initFace()
 {
-    qDebug() << config->value("FaceDetect/photo_path").toString();
-    faceThread = new FaceDeteThread(config->value("FaceDetect/photo_path").toString());
+#ifdef DEBUG
+    qDebug() << "照片目录：" << config->value("FaceDetect/sample").toString();
+    qDebug() << "测试用的证件照：" << config->value("Debug/photo").toString();
+#endif
+    faceThread = new FaceDeteThread(config->value("FaceDetect/sample").toString());
     faceThread->CanRun();
     connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceDeteThread::TrackFinished, this, &QUICreator::faceTrackFinished);
@@ -82,8 +93,33 @@ void QUICreator::faceTrackFinished(QVector<QRect> res)
  */
 void QUICreator::faceDetectFinished(QVector<Student> res)
 {
-    qDebug() << "detect finished";
+    // 先停止识别线程
     faceThread->StopImmediately();
+
+    // 清除UI上已经显示的识别结果
+    QLayoutItem* child;
+    while ((child = ui->resultHorizontalLayout->takeAt(0)) != nullptr) {
+        if (child->widget()) {
+            child->widget()->setParent(nullptr);
+        }
+        delete child;
+    }
+
+    // 向UI加载识别结果
+    StuWidget *widget;
+    for (auto r : res) {
+        if (!r.identifiable) {
+            continue;
+        }
+        widget = new StuWidget(this);
+        widget->setID(r.id);
+        widget->setName(r.name);
+        widget->setMajor(r.major);
+        widget->setPhoto(config->value("Debug/photo").toString());    // todo: 当前使用唯一的测试图片
+        ui->resultHorizontalLayout->addWidget(widget);
+    }
+
+
     for(auto r : res) {
         qDebug() << r.identifiable << r.id << "\t" << r.name << "\t" << r.major;
     }
