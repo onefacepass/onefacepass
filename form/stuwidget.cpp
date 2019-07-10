@@ -22,6 +22,11 @@ StuWidget::StuWidget(QWidget *parent) :
     QFont iconFont = QFont(fontName);
     iconFont.setPixelSize(15);
 
+    ui->labIconId->setFont(iconFont);
+    ui->labIconId->setText(QChar(0xf015));
+
+    ui->labIconName->setFont(iconFont);
+    ui->labName->setText(QChar(0xf007));
 }
 
 StuWidget::~StuWidget()
