@@ -9,9 +9,13 @@ FaceDeteThread::FaceDeteThread(const QString& photoPath) : canRun(true), detect(
 
     facedete->SetPreloadPath(photoPath.toStdString());
 
+    facedete->SetConfLevel(static_cast<MFloat>(0.8));
+
     if (facedete->Loadregface() == 0) {
         qDebug() << "\033[31m" << "FaceDeteThread | facedete->Loadregface() == 0" << "\033[0m";
     }
+
+
     qRegisterMetaType<QVector<QRect> >("QVector<QRect>");
     qRegisterMetaType<QVector<Student> >("QVector<Student>");
 }
@@ -67,7 +71,6 @@ void FaceDeteThread::run()
                 bool identifiable = currRes["identifiable"].asBool();
                 QString path(currRes["pathInPreload"].asString().data());
 
-                std::cerr << "xxx" << currRes["id"] << "\t" << currRes["identifiable"] << "\n";
 
                 // 检测模式下返回完整的人脸识别信息
                 resultComplete.push_back({identifiable,

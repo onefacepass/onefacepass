@@ -21,12 +21,12 @@ QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
 
     this->initFace();
 
-    StuWidget* stu = new StuWidget(this);
-    stu->setID("null");
-    stu->setName("null");
-    stu->setMajor("null");
-    stu->setPhoto("C:/Workspace/onefacepass/sample/4.jpg");
-    ui->resultHorizontalLayout->addWidget(stu);
+//    StuWidget* stu = new StuWidget(this);
+//    stu->setID("null");
+//    stu->setName("null");
+//    stu->setMajor("null");
+//    stu->setPhoto("C:/Workspace/onefacepass/sample/4.jpg");
+//    ui->resultHorizontalLayout->addWidget(stu);
 }
 
 QUICreator::~QUICreator()
@@ -46,10 +46,7 @@ void QUICreator::initForm()
 
     initStyle();
 
-    initStudentWidget(&stuWidgets);
-
-//    QtConcurrent::run(this, &QUICreator::initStudentWidget, &stuWidgets);
-
+    initStudentWidget();
 
     ui->tabWidget->setCurrentIndex(0);
 }
@@ -164,11 +161,11 @@ void QUICreator::initCamera()
     captureThread->start();
 }
 
-void QUICreator::initStudentWidget(QVector<std::shared_ptr<StuWidget>>* _stuWidgets)
+void QUICreator::initStudentWidget()
 {
     // 预先加载用来展示结果的图形控件
     for (int i = 0; i < MAX_RESULT; ++i) {
-        _stuWidgets->push_back(shared_ptr<StuWidget>(new StuWidget(this)));
+        stuWidgets.push_back(shared_ptr<StuWidget>(new StuWidget(this)));
     }
 }
 
@@ -281,13 +278,9 @@ void QUICreator::faceDetectFinished(QVector<Student> res)
     // 先停止识别线程
     faceThread->StopImmediately();
 
-    // 清除UI上已经显示的识别结果
-    QLayoutItem* child;
-    while ((child = ui->resultHorizontalLayout->takeAt(0)) != nullptr) {
-        if (child->widget()) {
-            child->widget()->setParent(nullptr);
-        }
-//        delete child;
+    // 清除UI上已经显示的识别结果，TODO: 这里处理得不是很好
+    for (int i = 0; i < MAX_RESULT; ++i) {
+        stuWidgets[i]->setParent(nullptr);
     }
 
     // 向UI加载识别结果
