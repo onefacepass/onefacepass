@@ -1,19 +1,30 @@
 ﻿#include "quicreator.h"
 #include "ui_quicreator.h"
+#include "stuwidget.h"
 
 #include "quiwidget.h"
 
 Q_DECLARE_METATYPE(QCameraInfo)
 
-QUICreator::QUICreator(QWidget *parent) :
+QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
     QMainWindow(parent),
     ui(new Ui::QUICreator)
 {
 
     ui->setupUi(this);
+
+    config = new QSettings(config_file, QSettings::IniFormat);
+
     this->initForm();
 
     this->initFace();
+
+    StuWidget* stu = new StuWidget(this);
+    stu->setID("null");
+    stu->setName("null");
+    stu->setMajor("null");
+    stu->setPhoto("C:/Workspace/onefacepass/sample/4.jpg");
+    ui->resultHorizontalLayout->addWidget(stu);
 }
 
 QUICreator::~QUICreator()
@@ -52,7 +63,11 @@ void QUICreator::initAction()
  */
 void QUICreator::initFace()
 {
-    faceThread = new FaceDeteThread();
+#ifdef DEBUG
+    qDebug() << "照片目录：" << config->value("FaceDetect/sample").toString();
+    qDebug() << "测试用的证件照：" << config->value("Debug/photo").toString();
+#endif
+    faceThread = new FaceDeteThread(config->value("FaceDetect/sample").toString());
     faceThread->CanRun();
     connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceDeteThread::TrackFinished, this, &QUICreator::faceTrackFinished);
@@ -78,8 +93,33 @@ void QUICreator::faceTrackFinished(QVector<QRect> res)
  */
 void QUICreator::faceDetectFinished(QVector<Student> res)
 {
-    qDebug() << "detect finished";
+    // 先停止识别线程
     faceThread->StopImmediately();
+
+    // 清除UI上已经显示的识别结果
+    QLayoutItem* child;
+    while ((child = ui->resultHorizontalLayout->takeAt(0)) != nullptr) {
+        if (child->widget()) {
+            child->widget()->setParent(nullptr);
+        }
+        delete child;
+    }
+
+    // 向UI加载识别结果
+    StuWidget *widget;
+    for (auto r : res) {
+        if (!r.identifiable) {
+            continue;
+        }
+        widget = new StuWidget(this);
+        widget->setID(r.id);
+        widget->setName(r.name);
+        widget->setMajor(r.major);
+        widget->setPhoto(config->value("Debug/photo").toString());    // todo: 当前使用唯一的测试图片
+        ui->resultHorizontalLayout->addWidget(widget);
+    }
+
+
     for(auto r : res) {
         qDebug() << r.identifiable << r.id << "\t" << r.name << "\t" << r.major;
     }
@@ -120,7 +160,7 @@ void QUICreator::initOther()
     ui->checkboxLog->setChecked(false);
 
     ui->widgetVerticalMenu->setProperty("nav", "left");
-    ui->widgetTop->setProperty("nav", "top");
+    ui->widgetPay->setProperty("nav", "top");
 
     ui->centralwidget->findChild<QWidget *>("widgetVideo")->setProperty("video", true);
 
@@ -388,7 +428,6 @@ void QUICreator::btnPayClicked()
     // 是不是要在这里验证身份
     // takeImage();
 }
-
 
 /*********************************************************
  *                      调试专用                          *

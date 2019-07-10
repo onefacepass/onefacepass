@@ -3,16 +3,15 @@
 #include "facedetethread.h"
 
 
-FaceDeteThread::FaceDeteThread() : canRun(true), detect(false)
+FaceDeteThread::FaceDeteThread(const QString& photoPath) : canRun(true), detect(false)
 {
     facedete = new FaceDete();
 
-    facedete->SetPreloadPath("C:\\Workspace\\onefacepass\\sample");
+    facedete->SetPreloadPath(photoPath.toStdString());
 
     if (facedete->Loadregface() == 0) {
         qDebug() << "\033[31m" << "FaceDeteThread | facedete->Loadregface() == 0" << "\033[0m";
     }
-    qRegisterMetaType<Student>("Student");
     qRegisterMetaType<QVector<QRect> >("QVector<QRect>");
     qRegisterMetaType<QVector<Student> >("QVector<Student>");
 }
@@ -35,7 +34,6 @@ void FaceDeteThread::run()
         }
 
 #ifdef DEBUG_FACE
-//    cv::imwrite("C:\\Users\\haoha\\Pictures\\mat.png", mat);
     qDebug() << "FaceDeteThread | detecting...";
 #endif
         if (facedete->DetectFaces(mat, detectedResult)) {
@@ -62,13 +60,14 @@ void FaceDeteThread::run()
         for (unsigned int i = 0; i < detectedResult.size(); i ++) {
             Json::Value currRes = detectedResult[std::to_string(i)];
 
-            if (detect) {
-                QString id(currRes["id"].asCString());
-                QString name(currRes["name"].asCString());
-                QString major(currRes["major"].asCString());
+            if (detect) {   //--- 人脸识别
+                QString id(currRes["id"].asString().data());
+                QString name(currRes["name"].asString().data());
+                QString major(currRes["major"].asString().data());
                 bool identifiable = currRes["identifiable"].asBool();
-                QString path(currRes["pathInPreload"].asCString());
+                QString path(currRes["pathInPreload"].asString().data());
 
+                // 检测模式下返回完整的人脸识别信息
                 resultComplete.push_back({identifiable,
                                           id,
                                           name,
@@ -76,7 +75,8 @@ void FaceDeteThread::run()
                                           QRect(currRes["rect"][0].asInt(), currRes["rect"][1].asInt(),
                                                 currRes["rect"][2].asInt()-currRes["rect"][0].asInt(), currRes["rect"][3].asInt()-currRes["rect"][1].asInt()),
                                           path});
-            } else {
+            } else {    //--- 仅人脸跟踪
+                // 跟踪模式下只返回人脸位置
                 resultOnlyTrack.push_back(QRect(currRes["rect"][0].asInt(), currRes["rect"][1].asInt(),
                         currRes["rect"][2].asInt()-currRes["rect"][0].asInt(), currRes["rect"][3].asInt()-currRes["rect"][1].asInt()));
             }

@@ -9,9 +9,11 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
+
     QApplication a(argc, argv);
     a.setFont(QFont("Microsoft Yahei", 9));
     a.setWindowIcon(QIcon(":/main.ico"));
+
 
     QUIWidget::setCode();
     QUIWidget::setTranslator(":/image/qt_zh_CN.qm");
@@ -20,6 +22,7 @@ int main(int argc, char *argv[])
 
     QUIWidget qui;
     QUICreator *creator = new QUICreator;
+
 
     //设置主窗体
     qui.setMainWidget(creator);

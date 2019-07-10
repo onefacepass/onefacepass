@@ -7,6 +7,7 @@
 #include <QCameraImageCapture>
 #include <QScopedPointer>
 #include <QCameraInfo>
+#include <QSettings>
 
 #include "FaceDete.h"
 #include "capturethread.h"
@@ -25,12 +26,14 @@ class QUICreator : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit QUICreator(QWidget *parent = nullptr);
+    explicit QUICreator(QWidget *parent = nullptr, const QString& config_file = ":/config.ini");
     ~QUICreator();
+
 
 private:
     Ui::QUICreator *ui;
     QImage img_tmp;
+    QSettings *config;
 
     QScopedPointer<QCamera> camera;
     QScopedPointer<QCameraImageCapture> imageCapture;
