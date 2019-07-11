@@ -5,6 +5,10 @@ CaptureThread::CaptureThread() : QThread ()
 
 }
 
+/*
+ * 周期性向UI线程发送信号，以控制截取视频流、人脸跟踪、人脸检测的时机
+ * Sleep 的时间需要仔细设置，否则可能会使UI线程不能及时得到人脸识别的结果反馈
+ */
 void CaptureThread::run()
 {
     int i = 0;
@@ -16,7 +20,7 @@ void CaptureThread::run()
 #endif
 
         i = i % 10 + 1;
-        QThread::msleep(200);
+        QThread::msleep(85);
 
         if (i % 10 != 0) {
             emit TrackFaceNotice();

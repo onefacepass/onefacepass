@@ -3,7 +3,7 @@
 #include "facedetethread.h"
 
 
-FaceDeteThread::FaceDeteThread(const QString& photoPath) : detect(false)
+FaceDeteThread::FaceDeteThread(const QString& photoPath)
 {
     facedete = new FaceDete();
 
@@ -13,7 +13,7 @@ FaceDeteThread::FaceDeteThread(const QString& photoPath) : detect(false)
 
     if (facedete->Loadregface() < 0) {
         // 没做完整的处理：过早的优化是罪恶之源
-        qDebug() << "\033[31m" << "FaceDeteThread | facedete->Loadregface() == 0" << "\033[0m";
+        qDebug() << "\033[31m" << "FaceDeteThread | facedete->Loadregface() < 0" << "\033[0m";
     }
 
 
@@ -21,87 +21,111 @@ FaceDeteThread::FaceDeteThread(const QString& photoPath) : detect(false)
     qRegisterMetaType<QVector<Student> >("QVector<Student>");
 }
 
+FaceDeteThread::~FaceDeteThread()
+{
+    tasks.clear();
+}
+
 void FaceDeteThread::run()
 {
+
+
+    while(!isInterruptionRequested()) {
+
+        while (!tasks.empty()) {
+
 #ifdef DEBUG_FACE
-    qDebug() << "FaceDeteThread | detecting...";
+            qDebug() << "FaceDeteThread | detecting...";
 #endif
-        if (facedete->DetectFaces(mat, detectedResult)) {
-            qDebug() << "FaceDeteThread | something is wrong while detecting";
-        }
+            { // lock begin
+                QMutexLocker locker(&lock);
+                t = tasks.dequeue();    // t: <图片 QImage, 是否进行检测 bool>
+                if (tasks.size() > 5) {
+                    continue;
+                }
+#ifdef DEBUG_FACE
+                qDebug() << "取到任务，"
+                         << "剩余：" << tasks.size();
+#endif
+            } // lock end
+
+            cv::Mat mat_tmp = cv::Mat(t.first.height(), t.first.width(), CV_8UC4, const_cast<uchar*>(t.first.bits()), t.first.bytesPerLine());
+            cv::Mat mat = cv::Mat(mat_tmp.rows, mat_tmp.cols, CV_8UC3 );
+            int from_to[] = { 0,0, 1,1, 2,2 };
+            cv::mixChannels( &mat_tmp, 1, &mat, 1, from_to, 3 );
+
+
+            if (facedete->DetectFaces(mat, detectedResult)) {
+                qDebug() << "FaceDeteThread | something is wrong while detecting";
+            }
 
 #ifdef DEBUG_FACE
         qDebug() << "FaceDeteThread | detection finished";
 #endif
 
-        if (detectedResult.empty()) {
+            if (detectedResult.empty()) {
 #ifdef DEBUG_FACE
         qDebug() << "\033[31m" << "FaceDeteThread | detectedResult empty! "
                  << detectedResult.size() << "\033[0m";
 #endif
-            if (detect)
-                emit DetectFinishedWihoutResult();
-            else
-                emit TrackFinishedWithoutResult();
+                if (t.second)
+                    emit DetectFinishedWihoutResult();
+                else
+                    emit TrackFinishedWithoutResult();
 
-            return;
-        }
-
-        for (unsigned int i = 0; i < detectedResult.size(); i ++) {
-            Json::Value currRes = detectedResult[std::to_string(i)];
-
-            if (detect) {   //--- 人脸识别
-                QString id(currRes["id"].asString().data());
-                QString name(currRes["name"].asString().data());
-                QString major(currRes["major"].asString().data());
-                bool identifiable = currRes["identifiable"].asBool();
-                QString path(currRes["pathInPreload"].asString().data());
-
-
-                // 检测模式下返回完整的人脸识别信息
-                resultComplete.push_back({identifiable,
-                                          id,
-                                          name,
-                                          major,
-                                          QRect(currRes["rect"][0].asInt(), currRes["rect"][1].asInt(),
-                                                currRes["rect"][2].asInt()-currRes["rect"][0].asInt(), currRes["rect"][3].asInt()-currRes["rect"][1].asInt()),
-                                          path});
-            } else {    //--- 仅人脸跟踪
-                // 跟踪模式下只返回人脸位置
-                resultOnlyTrack.push_back(QRect(currRes["rect"][0].asInt(), currRes["rect"][1].asInt(),
-                        currRes["rect"][2].asInt()-currRes["rect"][0].asInt(), currRes["rect"][3].asInt()-currRes["rect"][1].asInt()));
+                continue;
             }
+
+            for (unsigned int i = 0; i < detectedResult.size(); i ++) {
+                Json::Value currRes = detectedResult[std::to_string(i)];
+
+                if (t.second) {   //--- 人脸识别
+                    QString id(currRes["id"].asString().data());
+                    QString name(currRes["name"].asString().data());
+                    QString major(currRes["major"].asString().data());
+                    bool identifiable = currRes["identifiable"].asBool();
+                    QString path(currRes["pathInPreload"].asString().data());
+
+                    // 检测模式下返回完整的人脸识别信息
+                    resultComplete.push_back({identifiable,
+                                              id,
+                                              name,
+                                              major,
+                                              QRect(currRes["rect"][0].asInt(), currRes["rect"][1].asInt(),
+                                                    currRes["rect"][2].asInt()-currRes["rect"][0].asInt(), currRes["rect"][3].asInt()-currRes["rect"][1].asInt()),
+                                              path});
+                } else {    //--- 仅人脸跟踪
+                    // 跟踪模式下只返回人脸位置
+                    resultOnlyTrack.push_back(QRect(currRes["rect"][0].asInt(), currRes["rect"][1].asInt(),
+                            currRes["rect"][2].asInt()-currRes["rect"][0].asInt(), currRes["rect"][3].asInt()-currRes["rect"][1].asInt()));
+                }
+            }
+
+            if (t.second)
+                emit DetectFinished(resultComplete);
+            else
+                emit TrackFinished(resultOnlyTrack);
+
+
+            detectedResult.clear();
+            resultComplete.clear();
+            resultOnlyTrack.clear();
+
         }
 
-        if (detect)
-            emit DetectFinished(resultComplete);
-        else
-            emit TrackFinished(resultOnlyTrack);
+        // 等待tasks非空
+        // TODO: 有点暴力了
+        while (tasks.empty()) {
+            qDebug() << "等待10ms";
+            QThread::msleep(10);
+        }
 
-
-        detectedResult.clear();
-        resultComplete.clear();
-        resultOnlyTrack.clear();
+    }
 }
 
 void FaceDeteThread::ReceiveImg(bool _detect, const QImage& image)
 {
-#ifdef DEBUG_FACE
-    qDebug() << "FaceDeteThread | received image, " << image.format() <<", detect: " << _detect;
-#endif
+    QMutexLocker locker(&lock);
 
-    detect = _detect;
-
-    cv::Mat mat_tmp = cv::Mat(image.height(), image.width(), CV_8UC4, const_cast<uchar*>(image.bits()), image.bytesPerLine());
-    mat = cv::Mat(mat_tmp.rows, mat_tmp.cols, CV_8UC3 );
-    int from_to[] = { 0,0, 1,1, 2,2 };
-    cv::mixChannels( &mat_tmp, 1, &mat, 1, from_to, 3 );
-
-
-#ifdef DEBUG_FACE
-    qDebug() << "FaceDeteThread | convert image successfully, "
-             << cv::typeToString(mat.type()).c_str();
-    //    cv::imshow("debug", mat);
-    //    cv::imwrite("C:\\Users\\haoha\\Pictures\\mat.png", mat);
-#endif
+    tasks.enqueue({image, _detect});
 }

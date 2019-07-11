@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QVector>
 #include <QRect>
+#include <QQueue>
 
 #include "FaceDete.h"
 
@@ -26,15 +27,19 @@ class FaceDeteThread :  public QThread
     Q_OBJECT
 public:
     FaceDeteThread(const QString& photoPath);
+    ~FaceDeteThread();
 
 private:
     FaceDete* facedete;
-    QImage img;
-    cv::Mat mat;
-    bool detect;
+    QPair<QImage, bool> t;
+
     Json::Value detectedResult;
     QVector<QRect> resultOnlyTrack;
     QVector<Student> resultComplete;
+
+    QQueue<QPair<QImage, bool>> tasks;
+
+    QMutex lock;
 
 protected:
     void run();

@@ -23,13 +23,15 @@ QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
     initForm();
 
     initFace();
-
 }
 
 QUICreator::~QUICreator()
 {
     delete ui;
 
+    if (faceThread) {
+        faceThread->requestInterruption();
+    }
 }
 
 void QUICreator::initForm()
@@ -73,6 +75,8 @@ void QUICreator::initFace()
     connect(faceThread, &FaceDeteThread::TrackFinished, this, &QUICreator::faceTrackFinished);
     connect(faceThread, &FaceDeteThread::DetectFinishedWihoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
     connect(faceThread, &FaceDeteThread::TrackFinishedWithoutResult, this, &QUICreator::faceTrackFinishedWithoutResult);
+
+    faceThread->start();
 }
 
 
@@ -219,17 +223,11 @@ void QUICreator::setCamera(const QCameraInfo &cameraInfo)
  */
 void QUICreator::doFaceDetect()
 {
-    if (faceThread->isRunning()) {
-        return;
-    }
-
     if (this->img_tmp.isNull()) {
         return;
     }
 
     faceThread->ReceiveImg(true, this->img_tmp);
-
-    faceThread->start();
 }
 
 /*
@@ -237,17 +235,11 @@ void QUICreator::doFaceDetect()
  */
 void QUICreator::doFaceTrack()
 {
-    if (faceThread->isRunning()) {
-        return;
-    }
-
     if (this->img_tmp.isNull()) {
         return;
     }
 
     faceThread->ReceiveImg(false, this->img_tmp);
-
-    faceThread->start();
 }
 
 
