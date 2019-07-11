@@ -3,7 +3,7 @@
 #include "facedetethread.h"
 
 
-FaceDeteThread::FaceDeteThread(const QString& photoPath) : canRun(true), detect(false)
+FaceDeteThread::FaceDeteThread(const QString& photoPath) : detect(false)
 {
     facedete = new FaceDete();
 
@@ -11,7 +11,8 @@ FaceDeteThread::FaceDeteThread(const QString& photoPath) : canRun(true), detect(
 
     facedete->SetConfLevel(static_cast<MFloat>(0.8));
 
-    if (facedete->Loadregface() == 0) {
+    if (facedete->Loadregface() < 0) {
+        // 没做完整的处理：过早的优化是罪恶之源
         qDebug() << "\033[31m" << "FaceDeteThread | facedete->Loadregface() == 0" << "\033[0m";
     }
 
@@ -20,23 +21,8 @@ FaceDeteThread::FaceDeteThread(const QString& photoPath) : canRun(true), detect(
     qRegisterMetaType<QVector<Student> >("QVector<Student>");
 }
 
-void FaceDeteThread::StopImmediately()
-{
-//    QMutexLocker locker(&lock);
-//    canRun = false;
-}
-
 void FaceDeteThread::run()
 {
-//    while (1) {
-
-//        {
-//            QMutexLocker locker(&lock);
-//            if (!canRun) {
-//                return ;
-//            }
-//        }
-
 #ifdef DEBUG_FACE
     qDebug() << "FaceDeteThread | detecting...";
 #endif
@@ -96,13 +82,6 @@ void FaceDeteThread::run()
         detectedResult.clear();
         resultComplete.clear();
         resultOnlyTrack.clear();
-//    }
-}
-
-void FaceDeteThread::CanRun()
-{
-    QMutexLocker locker(&lock);
-    canRun = true;
 }
 
 void FaceDeteThread::ReceiveImg(bool _detect, const QImage& image)

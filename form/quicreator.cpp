@@ -17,16 +17,10 @@ QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
 
     config = new QSettings(config_file, QSettings::IniFormat);
 
-    this->initForm();
+    initForm();
 
-    this->initFace();
+    initFace();
 
-//    StuWidget* stu = new StuWidget(this);
-//    stu->setID("null");
-//    stu->setName("null");
-//    stu->setMajor("null");
-//    stu->setPhoto("C:/Workspace/onefacepass/sample/4.jpg");
-//    ui->resultHorizontalLayout->addWidget(stu);
 }
 
 QUICreator::~QUICreator()
@@ -72,7 +66,6 @@ void QUICreator::initFace()
     qDebug() << "测试用的证件照：" << config->value("Debug/photo").toString();
 #endif
     faceThread = new FaceDeteThread(config->value("FaceDetect/sample").toString());
-    faceThread->CanRun();
     connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceDeteThread::TrackFinished, this, &QUICreator::faceTrackFinished);
     connect(faceThread, &FaceDeteThread::DetectFinishedWihoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
@@ -232,7 +225,6 @@ void QUICreator::doFaceDetect()
     }
 
     faceThread->ReceiveImg(true, this->img_tmp);
-    faceThread->CanRun();
 
     faceThread->start();
 }
@@ -251,7 +243,6 @@ void QUICreator::doFaceTrack()
     }
 
     faceThread->ReceiveImg(false, this->img_tmp);
-    faceThread->CanRun();
 
     faceThread->start();
 }
@@ -263,8 +254,6 @@ void QUICreator::doFaceTrack()
  */
 void QUICreator::faceTrackFinished(QVector<QRect> res)
 {
-    faceThread->StopImmediately();
-
     ui->viewfinder->ReceiveRects(res);
     ui->viewfinder->update();
 }
@@ -275,9 +264,6 @@ void QUICreator::faceTrackFinished(QVector<QRect> res)
  */
 void QUICreator::faceDetectFinished(QVector<Student> res)
 {
-    // 先停止识别线程
-    faceThread->StopImmediately();
-
     // 清除UI上已经显示的识别结果，TODO: 这里处理得不是很好
     for (int i = 0; i < MAX_RESULT; ++i) {
         stuWidgets[i]->setParent(nullptr);
@@ -306,14 +292,10 @@ void QUICreator::faceDetectFinished(QVector<Student> res)
 
 void QUICreator::faceTrackFinishedWithoutResult()
 {
-    // 先停止识别线程
-    faceThread->StopImmediately();
 }
 
 void QUICreator::faceDetectFinishedWithoutResult()
 {
-    // 先停止识别线程
-    faceThread->StopImmediately();
 }
 
 /*
