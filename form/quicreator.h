@@ -10,9 +10,11 @@
 #include <QSettings>
 
 #include "stuwidget.h"
-#include "FaceDete.h"
+//#include "FaceDete.h"
+
 #include "capturethread.h"
-#include "facedetethread.h"
+#include "facethread.h"
+#include "posethread.h"
 
 class QPushButton;
 class QLineEdit;
@@ -41,7 +43,8 @@ private:
     QScopedPointer<QCameraImageCapture> imageCapture;
 
     CaptureThread *captureThread;
-    FaceDeteThread *faceThread;
+    FaceThread *faceThread;
+    PoseThread* poseThread;
 
     QVector<std::shared_ptr<StuWidget>> stuWidgets;
 
@@ -63,7 +66,7 @@ private slots:
     void initCamera();
     void initNav();
     void initAction();
-    void initFace();
+    void initFaceAndPose();
     void initStudentWidget();
     void initOther();
 
@@ -84,10 +87,17 @@ private slots:
     void initStyle();
     void about();
 
+    // 处理face线程发出的信号
     void faceDetectFinished(QVector<Student> res);
     void faceTrackFinished(QVector<QRect> res);
     void faceDetectFinishedWithoutResult();
     void faceTrackFinishedWithoutResult();
+
+    // 处理pose线程发出的信号
+    void poseDetectFinished();
+    void poseTrackFinished();
+    void poseDetectFinishedWithoutResult();
+    void poseTrackFinishedWithoutResult();
 };
 
 #endif // QUICREATOR_H

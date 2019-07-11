@@ -1,9 +1,6 @@
-﻿#include <QtConcurrent>
-
-#include "quicreator.h"
+﻿#include "quicreator.h"
 #include "ui_quicreator.h"
 #include "stuwidget.h"
-
 #include "quiwidget.h"
 
 Q_DECLARE_METATYPE(QCameraInfo)
@@ -22,7 +19,7 @@ QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
 
     initForm();
 
-    initFace();
+    initFaceAndPose();
 }
 
 QUICreator::~QUICreator()
@@ -31,6 +28,10 @@ QUICreator::~QUICreator()
 
     if (faceThread) {
         faceThread->requestInterruption();
+    }
+
+    if (poseThread) {
+        poseThread->requestInterruption();
     }
 }
 
@@ -64,19 +65,26 @@ void QUICreator::initAction()
 /*
  * @func: 初始化负责人脸识别的进程
  */
-void QUICreator::initFace()
+void QUICreator::initFaceAndPose()
 {
 #ifdef DEBUG
     qDebug() << "照片目录：" << config->value("FaceDetect/preload").toString();
     qDebug() << "测试用的证件照：" << config->value("Debug/photo").toString();
 #endif
-    faceThread = new FaceDeteThread(config->value("FaceDetect/preload").toString());
-    connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::faceDetectFinished);
-    connect(faceThread, &FaceDeteThread::TrackFinished, this, &QUICreator::faceTrackFinished);
-    connect(faceThread, &FaceDeteThread::DetectFinishedWihoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
-    connect(faceThread, &FaceDeteThread::TrackFinishedWithoutResult, this, &QUICreator::faceTrackFinishedWithoutResult);
+    faceThread = new FaceThread(config->value("FaceDetect/preload").toString());
+    connect(faceThread, &FaceThread::DetectFinished, this, &QUICreator::faceDetectFinished);
+    connect(faceThread, &FaceThread::TrackFinished, this, &QUICreator::faceTrackFinished);
+    connect(faceThread, &FaceThread::DetectFinishedWithoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
+    connect(faceThread, &FaceThread::TrackFinishedWithoutResult, this, &QUICreator::faceTrackFinishedWithoutResult);
+
+    poseThread = new PoseThread();
+    connect(poseThread, &PoseThread::DetectFinished, this, &QUICreator::poseDetectFinished);
+    connect(poseThread, &PoseThread::TrackFinished, this, &QUICreator::poseTrackFinished);
+    connect(poseThread, &PoseThread::DetectFinishedWithoutResult, this, &QUICreator::poseDetectFinishedWithoutResult);
+    connect(poseThread, &PoseThread::TrackFinishedWithoutResult, this, &QUICreator::poseTrackFinishedWithoutResult);
 
     faceThread->start();
+    poseThread->start();
 }
 
 
@@ -293,6 +301,44 @@ void QUICreator::faceTrackFinishedWithoutResult()
 void QUICreator::faceDetectFinishedWithoutResult()
 {
 }
+
+
+/*
+ * @func: 处理姿态跟踪结果
+ * TODO:
+ */
+void QUICreator::poseTrackFinished()
+{
+
+}
+
+/*
+ * @func: 处理姿态识别结果
+ * TODO
+ */
+void QUICreator::poseDetectFinished()
+{
+
+}
+
+/*
+ * @func:
+ * TODO
+ */
+void QUICreator::poseTrackFinishedWithoutResult()
+{
+
+}
+
+/*
+ * @func:
+ * TODO
+ */
+void QUICreator::poseDetectFinishedWithoutResult()
+{
+
+}
+
 
 /*
  * @func:       处理 takeImage 发送的信号

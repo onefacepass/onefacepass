@@ -1,9 +1,9 @@
 ﻿#include <QMutexLocker>
 
-#include "facedetethread.h"
+#include "facethread.h"
 
 
-FaceDeteThread::FaceDeteThread(const QString& photoPath)
+FaceThread::FaceThread(const QString& photoPath)
 {
     facedete = new FaceDete();
 
@@ -13,7 +13,7 @@ FaceDeteThread::FaceDeteThread(const QString& photoPath)
 
     if (facedete->Loadregface() < 0) {
         // 没做完整的处理：过早的优化是罪恶之源
-        qDebug() << "\033[31m" << "FaceDeteThread | facedete->Loadregface() < 0" << "\033[0m";
+        qDebug() << "\033[31m" << "FaceThread | facedete->Loadregface() < 0" << "\033[0m";
     }
 
 
@@ -21,12 +21,12 @@ FaceDeteThread::FaceDeteThread(const QString& photoPath)
     qRegisterMetaType<QVector<Student> >("QVector<Student>");
 }
 
-FaceDeteThread::~FaceDeteThread()
+FaceThread::~FaceThread()
 {
     tasks.clear();
 }
 
-void FaceDeteThread::run()
+void FaceThread::run()
 {
 
 
@@ -35,7 +35,7 @@ void FaceDeteThread::run()
         while (!tasks.empty()) {
 
 #ifdef DEBUG_FACE
-            qDebug() << "FaceDeteThread | detecting...";
+            qDebug() << "FaceThread | detecting...";
 #endif
             { // lock begin
                 QMutexLocker locker(&lock);
@@ -56,20 +56,20 @@ void FaceDeteThread::run()
 
 
             if (facedete->DetectFaces(mat, detectedResult)) {
-                qDebug() << "FaceDeteThread | something is wrong while detecting";
+                qDebug() << "FaceThread | something is wrong while detecting";
             }
 
 #ifdef DEBUG_FACE
-        qDebug() << "FaceDeteThread | detection finished";
+        qDebug() << "FaceThread | detection finished";
 #endif
 
             if (detectedResult.empty()) {
 #ifdef DEBUG_FACE
-        qDebug() << "\033[31m" << "FaceDeteThread | detectedResult empty! "
+        qDebug() << "\033[31m" << "FaceThread | detectedResult empty! "
                  << detectedResult.size() << "\033[0m";
 #endif
                 if (t.second)
-                    emit DetectFinishedWihoutResult();
+                    emit DetectFinishedWithoutResult();
                 else
                     emit TrackFinishedWithoutResult();
 
@@ -116,14 +116,13 @@ void FaceDeteThread::run()
         // 等待tasks非空
         // TODO: 有点暴力了
         while (tasks.empty()) {
-            qDebug() << "等待10ms";
             QThread::msleep(10);
         }
 
     }
 }
 
-void FaceDeteThread::ReceiveImg(bool _detect, const QImage& image)
+void FaceThread::ReceiveImg(bool _detect, const QImage& image)
 {
     QMutexLocker locker(&lock);
 
