@@ -29,11 +29,8 @@ public:
 
 private:
     FaceDete* facedete;
-    QMutex lock;
     QImage img;
     cv::Mat mat;
-    int faceRect[4];
-    bool canRun;
     bool detect;
     Json::Value detectedResult;
     QVector<QRect> resultOnlyTrack;
@@ -51,8 +48,6 @@ signals:
 
 public slots:
     void ReceiveImg(bool _detect, const QImage& image);
-    void StopImmediately();
-    void CanRun();
 };
 
 #endif // FACEDETETHREAD_H
