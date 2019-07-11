@@ -68,10 +68,10 @@ void QUICreator::initAction()
 void QUICreator::initFaceAndPose()
 {
 #ifdef DEBUG
-    qDebug() << "照片目录：" << config->value("FaceDetect/preload").toString();
-    qDebug() << "测试用的证件照：" << config->value("Debug/photo").toString();
+    qDebug() << "照片目录：" << QDir::toNativeSeparators(config->value("FaceDetect/preload").toString());
+    qDebug() << "测试用的证件照：" << QDir::toNativeSeparators(config->value("Debug/photo").toString());
 #endif
-    faceThread = new FaceThread(config->value("FaceDetect/preload").toString());
+    faceThread = new FaceThread(QDir::toNativeSeparators(config->value("FaceDetect/preload").toString()));
     connect(faceThread, &FaceThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceThread::TrackFinished, this, &QUICreator::faceTrackFinished);
     connect(faceThread, &FaceThread::DetectFinishedWithoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
@@ -128,7 +128,7 @@ void QUICreator::initOther()
 void QUICreator::about()
 {
 
-//    QUIWidget::showMessageBoxInfo(tr("关于一脸通"));
+    QUIWidget::showMessageBoxInfo(tr("关于一脸通"));
 //    QMessageBox::about(this, tr("关于一脸通"), tr("关于一脸通"));
 }
 
