@@ -48,9 +48,14 @@ private:
 private:
     void insertLog(const QString& log);
 
+    void checkConfig();
+
     // 打印摄像头支持的分辨率
     void debug_show_supported_viewfinder_resolutions();
+
     void debug_show_student_info(Student s);
+
+
 
 
 private slots:

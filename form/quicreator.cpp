@@ -17,6 +17,9 @@ QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
 
     config = new QSettings(config_file, QSettings::IniFormat);
 
+
+    checkConfig();
+
     initForm();
 
     initFace();
@@ -62,10 +65,10 @@ void QUICreator::initAction()
 void QUICreator::initFace()
 {
 #ifdef DEBUG
-    qDebug() << "照片目录：" << config->value("FaceDetect/sample").toString();
+    qDebug() << "照片目录：" << config->value("FaceDetect/preload").toString();
     qDebug() << "测试用的证件照：" << config->value("Debug/photo").toString();
 #endif
-    faceThread = new FaceDeteThread(config->value("FaceDetect/sample").toString());
+    faceThread = new FaceDeteThread(config->value("FaceDetect/preload").toString());
     connect(faceThread, &FaceDeteThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceDeteThread::TrackFinished, this, &QUICreator::faceTrackFinished);
     connect(faceThread, &FaceDeteThread::DetectFinishedWihoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
@@ -423,6 +426,23 @@ void QUICreator::btnPayClicked()
     // 是不是要在这里验证身份
     // takeImage();
 }
+
+void QUICreator::checkConfig()
+{
+    if (config->allKeys().size() == 0) {
+        QUIWidget::ShowMessageBoxErrorAndExit("配置文件初始化失败！");
+    } else if (!config->contains("FaceDetect/preload")) {
+        QUIWidget::ShowMessageBoxErrorAndExit("配置参数preload错误！");
+    }
+#ifdef DEBUG_CONFIG
+    qDebug() << "[CONFIG]";
+    foreach (auto key, config->allKeys()) {
+        qDebug() << key << "=" << config->value(key).toString();
+    }
+    qDebug() << "\n";
+#endif
+}
+
 
 /*********************************************************
  *                      调试专用                          *

@@ -242,6 +242,8 @@ public:
     static void showMessageBoxInfo(const QString &info, int closeSec = 0);
     //弹出错误框
     static void showMessageBoxError(const QString &info, int closeSec = 0);
+    //弹出错误框并退出程序
+    static void ShowMessageBoxErrorAndExit(const QString &info, int closeSec = 0);
     //弹出询问框
     static int showMessageBoxQuestion(const QString &info);
 
