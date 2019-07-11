@@ -275,7 +275,8 @@ void QUICreator::faceDetectFinished(QVector<Student> res)
         stuWidgets[i]->setID(res[i].id);
         stuWidgets[i]->setName(res[i].name);
         stuWidgets[i]->setMajor(res[i].major);
-        stuWidgets[i]->setPhoto(config->value("Debug/photo").toString());    // todo: 当前使用唯一的测试图片
+//        stuWidgets[i]->setPhoto(config->value("Debug/photo").toString());    // todo: 当前使用唯一的测试图片
+        stuWidgets[i]->setPhoto(res[i].path);
         ui->resultHorizontalLayout->addWidget(stuWidgets[i].get());
     }
 
