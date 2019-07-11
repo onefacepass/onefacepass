@@ -73,8 +73,8 @@ private slots:
     void setStyle(const QString &str);
     void takeImage();
     void processCapturedImage(int requestId, const QImage& img);
-    void doFaceDetect();
-    void doFaceTrack();
+    void doDetect();
+    void doTrack();
 
     void setCamera(const QCameraInfo &camera_info);
     void updateCamera(QAction *action);

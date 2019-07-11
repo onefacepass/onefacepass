@@ -163,8 +163,8 @@ void QUICreator::initCamera()
 
     connect(captureThread, &CaptureThread::CaptureNotice, this, &QUICreator::takeImage);
 
-    connect(captureThread, &CaptureThread::DetectFaceNotice, this, &QUICreator::doFaceDetect);
-    connect(captureThread, &CaptureThread::TrackFaceNotice, this, &QUICreator::doFaceTrack);
+    connect(captureThread, &CaptureThread::DetectFaceNotice, this, &QUICreator::doDetect);
+    connect(captureThread, &CaptureThread::TrackFaceNotice, this, &QUICreator::doTrack);
 
     captureThread->start();
 }
@@ -227,27 +227,29 @@ void QUICreator::setCamera(const QCameraInfo &cameraInfo)
 }
 
 /*
- * @func: 通知线程进行人脸识别
+ * @func: 通知线程进行人脸识别和姿态识别
  */
-void QUICreator::doFaceDetect()
+void QUICreator::doDetect()
 {
     if (this->img_tmp.isNull()) {
         return;
     }
 
     faceThread->ReceiveImg(true, this->img_tmp);
+    // poseThread->ReceiveImg(true, this->img_tmp); // TODO
 }
 
 /*
- * @func: 通知线程进行人脸跟踪
+ * @func: 通知线程进行人脸跟踪和姿态跟踪
  */
-void QUICreator::doFaceTrack()
+void QUICreator::doTrack()
 {
     if (this->img_tmp.isNull()) {
         return;
     }
 
     faceThread->ReceiveImg(false, this->img_tmp);
+    // poseThread->ReceiveImg(false, this->img_tmp);    // TODO
 }
 
 
