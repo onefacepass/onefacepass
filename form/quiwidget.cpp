@@ -1029,6 +1029,13 @@ void QUIWidget::showMessageBoxError(const QString &info, int closeSec)
     QUIMessageBox::Instance()->show();
 }
 
+void QUIWidget::ShowMessageBoxErrorAndExit(const QString &info, int closeSec)
+{
+    QUIMessageBox::Instance()->setMessage(info, 2, closeSec);
+    QUIMessageBox::Instance()->show();
+
+}
+
 int QUIWidget::showMessageBoxQuestion(const QString &info)
 {
     QUIMessageBox msg;
@@ -1759,6 +1766,9 @@ void QUIMessageBox::closeEvent(QCloseEvent *)
 {
     closeSec = 0;
     currentSec = 0;
+    if (this->labTitle->text() == "错误") {
+        QApplication::exit();
+    }
 }
 
 bool QUIMessageBox::eventFilter(QObject *obj, QEvent *evt)

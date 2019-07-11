@@ -10,9 +10,10 @@ DESTDIR         = $$PWD/bin
 #win32:RC_FILE   = other/main.rc
 PRECOMPILED_HEADER  = head.h
 
-DEFINES +=  DEBUG=\\\"true\\\"
-#DEFINES +=  DEBUG_FACE=\\\"true\\\"
-DEFINES +=  DEBUG_THREAD=\\\"true\\\"
+DEFINES +=  DEBUG
+#DEFINES +=  DEBUG_FACE
+DEFINES +=  DEBUG_THREAD
+DEFINES += DEBUG_CONFIG
 
 
 INCLUDEPATH     +=  $$PWD        \
@@ -22,36 +23,37 @@ INCLUDEPATH     +=  $$PWD        \
                     $$PWD/3rdparty/face_module/include   \
                     $$PWD/3rdparty/jsoncpp/include
 
-CONFIG          += qt warn_off
+#CONFIG          += qt warn_off
 
 LIBS            +=  $$(OPENCV)/x64/vc15/lib/opencv_world346d.lib   \
                     $$PWD/3rdparty/face_module/lib/face_module.lib     \
+#                    C:/Workspace/face_recognition/x64/Debug/face_module.lib     \
                     $$(ARCFACE)/lib/X64/libarcsoft_face_engine.lib      \
-                    $$PWD/3rdparty/jsoncpp/lib/jsoncpp.lib
+                    $$PWD/3rdparty/jsoncpp/lib/jsoncppd.lib
 
 
 
 SOURCES += main.cpp\
     form/cameraviewfinder.cpp \
     form/capturethread.cpp \
-    form/facedetethread.cpp \
+    form/facethread.cpp \
     form/quiwidget.cpp \
     form/quicreator.cpp \
     form/appinit.cpp    \
-    form/stuwidget.cpp
-#    form/FaceTrackThread.cpp
+    form/stuwidget.cpp \
+    form/posethread.cpp
 
 
 
 HEADERS  += head.h\
     form/cameraviewfinder.h \
     form/capturethread.h \
-    form/facedetethread.h \
+    form/facethread.h \
     form/quiwidget.h \
     form/quicreator.h \
     form/appinit.h  \
-    form/stuwidget.h
-#    form/FaceTrackThread.h
+    form/stuwidget.h    \
+    form/posethread.h
 
 
 

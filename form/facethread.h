@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QVector>
 #include <QRect>
+#include <QQueue>
 
 #include "FaceDete.h"
 
@@ -20,28 +21,32 @@ typedef struct t_student {
 
 
 
-//class FaceDeteThread :  public QObject, public QRunnable
-class FaceDeteThread :  public QThread
+//class FaceThread :  public QObject, public QRunnable
+class FaceThread :  public QThread
 {
     Q_OBJECT
 public:
-    FaceDeteThread(const QString& photoPath);
+    FaceThread(const QString& photoPath);
+    ~FaceThread();
 
 private:
     FaceDete* facedete;
-    QImage img;
-    cv::Mat mat;
-    bool detect;
+    QPair<QImage, bool> t;
+
     Json::Value detectedResult;
     QVector<QRect> resultOnlyTrack;
     QVector<Student> resultComplete;
+
+    QQueue<QPair<QImage, bool>> tasks;
+
+    QMutex lock;
 
 protected:
     void run();
 
 signals:
     void DetectFinished(QVector<Student> res);
-    void DetectFinishedWihoutResult();
+    void DetectFinishedWithoutResult();
 
     void TrackFinished(QVector<QRect> res);
     void TrackFinishedWithoutResult();
