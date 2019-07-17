@@ -33,6 +33,9 @@ QUICreator::~QUICreator()
     if (poseThread) {
         poseThread->requestInterruption();
     }
+
+    faceThread->wait();
+    poseThread->wait();
 }
 
 void QUICreator::initForm()
@@ -69,7 +72,6 @@ void QUICreator::initFaceAndPose()
 {
 #ifdef DEBUG
     qDebug() << "照片目录：" << QDir::toNativeSeparators(config->value("FaceDetect/preload").toString());
-    qDebug() << "测试用的证件照：" << QDir::toNativeSeparators(config->value("Debug/photo").toString());
 #endif
     faceThread = new FaceThread(QDir::toNativeSeparators(config->value("FaceDetect/preload").toString()));
     connect(faceThread, &FaceThread::DetectFinished, this, &QUICreator::faceDetectFinished);
@@ -157,6 +159,10 @@ void QUICreator::initCamera()
 
 //    connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
 
+    // 没有摄像头的情况
+    if (QCameraInfo::defaultCamera().isNull()) {
+        QUIWidget::ShowMessageBoxErrorAndExit("没有检测到摄像头，请检查硬件设备是否连接！");
+    }
     // 使用默认摄像头
     setCamera(QCameraInfo::defaultCamera());
 
