@@ -14,8 +14,15 @@ public:
 
 	void SetPreloadPath(string path);
 
+	std::string GetPreloadPath() const;
+
 	void SetConfLevel(MFloat Level);
 
+	MFloat GetConfLevel() const;
+	
+	/*
+	* 获取注册的数量
+	*/
 	size_t GetRestrSize();
 
 	/*
@@ -53,16 +60,21 @@ public:
 
 	/*
 	* @ 返回值
-	*	>0 加载成功的数量
-	*	0 加载失败，有可能是路径错误
+	*	>=0 加载成功，且其值表示注册成功的数量
+	*	-1 路径错误
+	*	-2 json文件不存在
+	*	-3 json文件读取错误，可能是json格式不规范
 	*/
-	int Loadregface();
+	int Loadregface(string &errmsg);
 
 	/*
 	* @ 参数
 	*	image [可能]包含人脸的图像
 	*	detectedResult 识别的结果
-	* @ 无返回
+	* @ 返回值
+	*	-1 ASFDetectFaces 错误
+	*	0 无异常(并不确保识别过程正确) 获取检测过程信息请开启FACEDEBUG
+	* 
 	*/
 	int DetectFaces(Mat &image, Json::Value &detectedResult);
 
@@ -73,7 +85,6 @@ private:
 
 	/*
 	* 从图像中提取人脸特征值，只提取单张人脸
-	*
 	* @ 参数
 	*	DetectedResult
 	* @ 返回值
@@ -93,6 +104,13 @@ private:
 	*/
 	int CompareFeature(DetectedResult& result);
 
+	/*
+	* 检查preload图像加载情况，json文件是否确实匹配对象
+	*
+	*
+	*/
+	string CheckPreload();
+
 private:
 	MRESULT res;
 	MHandle handle;
@@ -100,7 +118,7 @@ private:
 	MFloat threshold_confidenceLevel;
 	/*
 	*	struct PreloadInfo {
-	*		eature feature;
+	*		ASF_FaceFeature feature;
 	*  		std::string filename;
 	*	};
 	*/
