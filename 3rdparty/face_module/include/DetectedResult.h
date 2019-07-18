@@ -14,7 +14,7 @@ public:
 	ASF_GenderInfo genderInfo;
 	ASF_LivenessInfo livenessInfo;
 	// ...
-
+	 
 	// 当前人脸的位置
 	// faceRect[0],faceRect[1]: (x1,y1)
 	// faceRect[2],faceRect[3]: (x2,y2)

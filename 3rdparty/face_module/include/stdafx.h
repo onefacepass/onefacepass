@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <opencv2\opencv.hpp>
 
 #include "arcsoft_face_sdk.h"
@@ -21,7 +22,7 @@
 *	将检测诸如年龄，是否为活体，性别等信息
 *
 */
-#define FACEDEBUG 
+// #define FACEDEBUG 
 // #define OTHERINFO
 
 using namespace cv;
