@@ -11,7 +11,8 @@ FaceThread::FaceThread(const QString& photoPath)
 
     facedete->SetConfLevel(static_cast<MFloat>(0.8));
 
-    if (facedete->Loadregface() < 0) {
+    std::string errmsg;
+    if (facedete->Loadregface(errmsg) < 0) {
         // 没做完整的处理：过早的优化是罪恶之源
         qDebug() << "\033[31m" << "FaceThread | facedete->Loadregface() < 0" << "\033[0m";
     }
@@ -41,6 +42,7 @@ void FaceThread::run()
                 QMutexLocker locker(&lock);
                 t = tasks.dequeue();    // t: <图片 QImage, 是否进行检测 bool>
                 if (tasks.size() > 5) {
+                    // 积累的任务过多时，直接跳过早期的任务，预感这里后期会有Bug...
                     continue;
                 }
 #ifdef DEBUG_FACE

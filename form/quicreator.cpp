@@ -33,6 +33,9 @@ QUICreator::~QUICreator()
     if (poseThread) {
         poseThread->requestInterruption();
     }
+
+    faceThread->wait();
+    poseThread->wait();
 }
 
 void QUICreator::initForm()
@@ -68,10 +71,9 @@ void QUICreator::initAction()
 void QUICreator::initFaceAndPose()
 {
 #ifdef DEBUG
-    qDebug() << "照片目录：" << config->value("FaceDetect/preload").toString();
-    qDebug() << "测试用的证件照：" << config->value("Debug/photo").toString();
+    qDebug() << "照片目录：" << QDir::toNativeSeparators(config->value("FaceDetect/preload").toString());
 #endif
-    faceThread = new FaceThread(config->value("FaceDetect/preload").toString());
+    faceThread = new FaceThread(QDir::toNativeSeparators(config->value("FaceDetect/preload").toString()));
     connect(faceThread, &FaceThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceThread::TrackFinished, this, &QUICreator::faceTrackFinished);
     connect(faceThread, &FaceThread::DetectFinishedWithoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
@@ -128,7 +130,7 @@ void QUICreator::initOther()
 void QUICreator::about()
 {
 
-//    QUIWidget::showMessageBoxInfo(tr("关于一脸通"));
+    QUIWidget::showMessageBoxInfo(tr("关于一脸通"));
 //    QMessageBox::about(this, tr("关于一脸通"), tr("关于一脸通"));
 }
 
@@ -157,6 +159,10 @@ void QUICreator::initCamera()
 
 //    connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
 
+    // 没有摄像头的情况
+    if (QCameraInfo::defaultCamera().isNull()) {
+        QUIWidget::ShowMessageBoxErrorAndExit("没有检测到摄像头，请检查硬件设备是否连接！");
+    }
     // 使用默认摄像头
     setCamera(QCameraInfo::defaultCamera());
 
