@@ -2,24 +2,46 @@
 
 #include "facethread.h"
 
+FaceThread* FaceThread::self = nullptr;
 
-FaceThread::FaceThread(const QString& photoPath)
+FaceThread::FaceThread()
 {
     facedete = new FaceDete();
 
-    facedete->SetPreloadPath(photoPath.toStdString());
-
     facedete->SetConfLevel(static_cast<MFloat>(0.8));
-
-    std::string errmsg;
-    if (facedete->Loadregface(errmsg) < 0) {
-        // 没做完整的处理：过早的优化是罪恶之源
-        qDebug() << "\033[31m" << "FaceThread | facedete->Loadregface() < 0" << "\033[0m";
-    }
-
 
     qRegisterMetaType<QVector<QRect> >("QVector<QRect>");
     qRegisterMetaType<QVector<Student> >("QVector<Student>");
+}
+
+void FaceThread::SetPreloadPath(const QString &path)
+{
+    facedete->SetPreloadPath(path.toStdString());
+
+    std::string errmsg;
+    if (facedete->Loadregface(errmsg) < 0) {
+        // FIXME: 没做完整的处理，出现问题记得检查
+        qDebug() << "\033[31m" << "FaceThread | facedete->Loadregface() < 0" << "\033[0m";
+    }
+
+    if (!errmsg.empty()) {
+        std::cerr << errmsg << "\n";
+    }
+}
+
+FaceThread* FaceThread::Instance()
+{
+    static QMutex mutex;
+
+    if (!self) {
+        QMutexLocker locker(&mutex);
+
+        if (!self) {
+            self = new FaceThread();
+        }
+    }
+
+    return self;
 }
 
 FaceThread::~FaceThread()
@@ -29,8 +51,6 @@ FaceThread::~FaceThread()
 
 void FaceThread::run()
 {
-
-
     while(!isInterruptionRequested()) {
 
         while (!tasks.empty()) {
@@ -43,7 +63,10 @@ void FaceThread::run()
                 t = tasks.dequeue();    // t: <图片 QImage, 是否进行检测 bool>
                 if (tasks.size() > 5) {
                     // 积累的任务过多时，直接跳过早期的任务，预感这里后期会有Bug...
-                    continue;
+                    // continue;
+
+                    // 积累的任务多了就扔吧
+                    tasks.clear();
                 }
 #ifdef DEBUG_FACE
                 qDebug() << "取到任务，"
@@ -113,12 +136,6 @@ void FaceThread::run()
             resultComplete.clear();
             resultOnlyTrack.clear();
 
-        }
-
-        // 等待tasks非空
-        // TODO: 有点暴力了
-        while (tasks.empty()) {
-            QThread::msleep(10);
         }
 
     }

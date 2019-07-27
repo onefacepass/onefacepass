@@ -73,7 +73,8 @@ void QUICreator::initFaceAndPose()
 #ifdef DEBUG
     qDebug() << "照片目录：" << QDir::toNativeSeparators(config->value("FaceDetect/preload").toString());
 #endif
-    faceThread = new FaceThread(QDir::toNativeSeparators(config->value("FaceDetect/preload").toString()));
+    faceThread = FaceThread::Instance();
+    faceThread->SetPreloadPath(QDir::toNativeSeparators(config->value("FaceDetect/preload").toString()));
     connect(faceThread, &FaceThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceThread::TrackFinished, this, &QUICreator::faceTrackFinished);
     connect(faceThread, &FaceThread::DetectFinishedWithoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);

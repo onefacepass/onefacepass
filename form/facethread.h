@@ -2,6 +2,7 @@
 #define FACEDETETHREAD_H
 
 #include <QMutex>
+//#include <QWaitCondition>
 #include <QImage>
 #include <QVector>
 #include <QRect>
@@ -26,10 +27,19 @@ class FaceThread :  public QThread
 {
     Q_OBJECT
 public:
-    FaceThread(const QString& photoPath);
+
     ~FaceThread();
 
+    static FaceThread* Instance();
+
+    // 一定要先设置好Preload再使用
+    void SetPreloadPath(const QString &path);
+
 private:
+    FaceThread();
+
+    static FaceThread *self;
+
     FaceDete* facedete;
     QPair<QImage, bool> t;
 
@@ -40,6 +50,7 @@ private:
     QQueue<QPair<QImage, bool>> tasks;
 
     QMutex lock;
+//    QWaitCondition cond;
 
 protected:
     void run();
