@@ -12,7 +12,7 @@ protected:
     void run();
 
 signals:
-    void CaptureNotice();
+    void CaptureNotice(const QString &location = QString());
     void DetectFaceNotice();
     void TrackFaceNotice();
 };

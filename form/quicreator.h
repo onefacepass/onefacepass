@@ -65,13 +65,13 @@ private slots:
     void initForm();
     void initCamera();
     void initNav();
-    void initAction();
+//    void initAction();
     void initFaceAndPose();
     void initStudentWidget();
     void initOther();
 
     void setStyle(const QString &str);
-    void takeImage();
+//    void takeImage();
     void processCapturedImage(int requestId, const QImage& img);
     void doDetect();
     void doTrack();
@@ -85,7 +85,6 @@ private slots:
     void navBtnClicked();
 
     void initStyle();
-    void about();
 
     // 处理face线程发出的信号
     void faceDetectFinished(QVector<Student> res);

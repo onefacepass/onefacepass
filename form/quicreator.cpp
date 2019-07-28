@@ -9,16 +9,14 @@ QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
     QMainWindow(parent),
     ui(new Ui::QUICreator)
 {
-
     ui->setupUi(this);
 
     config = new QSettings(config_file, QSettings::IniFormat);
 
-
     checkConfig();
-
     initForm();
 
+    initCamera();
     initFaceAndPose();
 }
 
@@ -40,10 +38,7 @@ QUICreator::~QUICreator()
 
 void QUICreator::initForm()
 {
-    initAction();
     initNav();
-
-    initCamera();
 
     initOther();
 
@@ -54,37 +49,27 @@ void QUICreator::initForm()
     ui->tabWidget->setCurrentIndex(0);
 }
 
-void QUICreator::initAction()
-{
-    QAction *actionAbout = new QAction(this);
-    actionAbout->setText(tr("关于"));
-    actionAbout->setToolTip(tr("关于一脸通"));
-    connect(actionAbout, &QAction::triggered, this, &QUICreator::about);
-
-
-    ui->menuHelp->addAction(actionAbout);
-}
-
 /*
  * @func: 初始化负责人脸识别的进程
  */
 void QUICreator::initFaceAndPose()
 {
 #ifdef DEBUG
-    qDebug() << "照片目录：" << QDir::toNativeSeparators(config->value("FaceDetect/preload").toString());
+    insertLog("照片目录：" + QDir::toNativeSeparators(config->value("FaceDetect/preload").toString()));
 #endif
     faceThread = FaceThread::Instance();
     faceThread->SetPreloadPath(QDir::toNativeSeparators(config->value("FaceDetect/preload").toString()));
+
     connect(faceThread, &FaceThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceThread::TrackFinished, this, &QUICreator::faceTrackFinished);
-    connect(faceThread, &FaceThread::DetectFinishedWithoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
-    connect(faceThread, &FaceThread::TrackFinishedWithoutResult, this, &QUICreator::faceTrackFinishedWithoutResult);
+//    connect(faceThread, &FaceThread::DetectFinishedWithoutResult, this, &QUICreator::faceDetectFinishedWithoutResult);
+//    connect(faceThread, &FaceThread::TrackFinishedWithoutResult, this, &QUICreator::faceTrackFinishedWithoutResult);
 
     poseThread = new PoseThread();
     connect(poseThread, &PoseThread::DetectFinished, this, &QUICreator::poseDetectFinished);
     connect(poseThread, &PoseThread::TrackFinished, this, &QUICreator::poseTrackFinished);
-    connect(poseThread, &PoseThread::DetectFinishedWithoutResult, this, &QUICreator::poseDetectFinishedWithoutResult);
-    connect(poseThread, &PoseThread::TrackFinishedWithoutResult, this, &QUICreator::poseTrackFinishedWithoutResult);
+//    connect(poseThread, &PoseThread::DetectFinishedWithoutResult, this, &QUICreator::poseDetectFinishedWithoutResult);
+//    connect(poseThread, &PoseThread::TrackFinishedWithoutResult, this, &QUICreator::pose1TrackFinishedWithoutResult);
 
     faceThread->start();
     poseThread->start();
@@ -118,9 +103,7 @@ void QUICreator::initOther()
     ui->widgetVerticalMenu->setProperty("nav", "left");
     ui->widgetPay->setProperty("nav", "top");
 
-    ui->centralwidget->findChild<QWidget *>("widgetVideo")->setProperty("video", true);
-
-//    ui->btnPay->setEnabled(false);
+//    ui->centralwidget->findChild<QWidget *>("widgetVideo")->setProperty("video", true);
 
     connect(ui->btnReadyPay, &QPushButton::clicked, this, &QUICreator::btnReadyPayClicked);
     connect(ui->btnResetPay, &QPushButton::clicked, this, &QUICreator::resetConsumption);
@@ -128,12 +111,6 @@ void QUICreator::initOther()
     connect(ui->btnPay, &QPushButton::clicked, this, &QUICreator::btnPayClicked);
 }
 
-void QUICreator::about()
-{
-
-    QUIWidget::showMessageBoxInfo(tr("关于一脸通"));
-//    QMessageBox::about(this, tr("关于一脸通"), tr("关于一脸通"));
-}
 
 /*
  * @func: 初始化摄像头 & 初始化负载对视频流截图的进程
@@ -141,24 +118,6 @@ void QUICreator::about()
 void QUICreator::initCamera()
 {
     captureThread = new CaptureThread();
-//    connect(captureThread, &QThread::finished, captureThread, &QObject::deleteLater);
-
-// 加载“设备”菜单：后面现场调试时，可能电脑上会有多个摄像头设备吧！
-// TODO: 当前多摄像设备的支持是有Bug的，后续再考虑修复Bug或者删除该支持
-//    QActionGroup *videoDevicesGroup = new QActionGroup(this);
-//    videoDevicesGroup->setExclusive(true);
-//    const QList<QCameraInfo> availableCameras = QCameraInfo::availableCameras();
-//    for (const QCameraInfo &cameraInfo : availableCameras) {
-//        QAction *videoDeviceAction = new QAction(cameraInfo.description(), videoDevicesGroup);
-//        videoDeviceAction->setCheckable(true);
-//        videoDeviceAction->setData(QVariant::fromValue(cameraInfo));
-//        if (cameraInfo == QCameraInfo::defaultCamera())
-//            videoDeviceAction->setChecked(true);
-
-//        ui->menuDevice->addAction(videoDeviceAction);
-//    }
-
-//    connect(videoDevicesGroup, &QActionGroup::triggered, this, &QUICreator::updateCamera);
 
     // 没有摄像头的情况
     if (QCameraInfo::defaultCamera().isNull()) {
@@ -167,9 +126,8 @@ void QUICreator::initCamera()
     // 使用默认摄像头
     setCamera(QCameraInfo::defaultCamera());
 
-
-    connect(captureThread, &CaptureThread::CaptureNotice, this, &QUICreator::takeImage);
-
+//    connect(captureThread, &CaptureThread::CaptureNotice, this, &QUICreator::takeImage);
+    connect(captureThread, &CaptureThread::CaptureNotice, imageCapture.data(), &QCameraImageCapture::capture);
     connect(captureThread, &CaptureThread::DetectFaceNotice, this, &QUICreator::doDetect);
     connect(captureThread, &CaptureThread::TrackFaceNotice, this, &QUICreator::doTrack);
 
@@ -188,10 +146,10 @@ void QUICreator::initStudentWidget()
  * @func: 对视频流进行截图
  *        这里会触发QCameraImageCapture::imageCaptured信号
  */
-void QUICreator::takeImage()
-{
-    imageCapture->capture();
-}
+//void QUICreator::takeImage()
+//{
+//    imageCapture->capture();
+//}
 
 /*
  * @func: 切换摄像头
@@ -483,11 +441,10 @@ void QUICreator::checkConfig()
         QUIWidget::ShowMessageBoxErrorAndExit("配置参数preload错误！");
     }
 #ifdef DEBUG_CONFIG
-    qDebug() << "[CONFIG]";
+    insertLog("[CONFIG]");
     foreach (auto key, config->allKeys()) {
-        qDebug() << key << "=" << config->value(key).toString();
+        insertLog(key + "=" + config->value(key).toString());
     }
-    qDebug() << "\n";
 #endif
 }
 
