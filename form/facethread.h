@@ -30,6 +30,7 @@ public:
 
     ~FaceThread();
 
+    // 单例模式
     static FaceThread* Instance();
 
     // 一定要先设置好Preload再使用
@@ -50,17 +51,14 @@ private:
     QQueue<QPair<QImage, bool>> tasks;
 
     QMutex lock;
-//    QWaitCondition cond;
+    QWaitCondition cond;
 
 protected:
     void run();
 
 signals:
     void DetectFinished(QVector<Student> res);
-    void DetectFinishedWithoutResult();
-
     void TrackFinished(QVector<QRect> res);
-    void TrackFinishedWithoutResult();
 
 public slots:
     void ReceiveImg(bool _detect, const QImage& image);

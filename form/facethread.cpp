@@ -20,13 +20,15 @@ void FaceThread::SetPreloadPath(const QString &path)
 
     std::string errmsg;
     if (facedete->Loadregface(errmsg) < 0) {
+        // 这个errmsg 参数应该保留在 Loadregface 内部，而不是暴露出来
         // FIXME: 没做完整的处理，出现问题记得检查
         qDebug() << "\033[31m" << "FaceThread | facedete->Loadregface() < 0" << "\033[0m";
     }
 
-    if (!errmsg.empty()) {
-        std::cerr << errmsg << "\n";
-    }
+//    if (!errmsg.empty()) {
+//        // 这里的处理应该移回到 FaceDete 库，而不应该把问题暴露给调用者
+//        std::cerr << errmsg << "\n";
+//    }
 }
 
 FaceThread* FaceThread::Instance()
@@ -60,11 +62,9 @@ void FaceThread::run()
 #endif
             { // lock begin
                 QMutexLocker locker(&lock);
+
                 t = tasks.dequeue();    // t: <图片 QImage, 是否进行检测 bool>
                 if (tasks.size() > 5) {
-                    // 积累的任务过多时，直接跳过早期的任务，预感这里后期会有Bug...
-                    // continue;
-
                     // 积累的任务多了就扔吧
                     tasks.clear();
                 }
@@ -93,11 +93,6 @@ void FaceThread::run()
         qDebug() << "\033[31m" << "FaceThread | detectedResult empty! "
                  << detectedResult.size() << "\033[0m";
 #endif
-                if (t.second)
-                    emit DetectFinishedWithoutResult();
-                else
-                    emit TrackFinishedWithoutResult();
-
                 continue;
             }
 
@@ -126,11 +121,8 @@ void FaceThread::run()
                 }
             }
 
-            if (t.second)
-                emit DetectFinished(resultComplete);
-            else
-                emit TrackFinished(resultOnlyTrack);
 
+            emit t.second ? DetectFinished(resultComplete) : TrackFinished(resultOnlyTrack);
 
             detectedResult.clear();
             resultComplete.clear();

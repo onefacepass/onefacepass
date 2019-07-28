@@ -154,10 +154,10 @@ void QUICreator::initStudentWidget()
 /*
  * @func: 切换摄像头
  */
-void QUICreator::updateCamera(QAction *action)
-{
-    QUICreator::setCamera(qvariant_cast<QCameraInfo>(action->data()));
-}
+//void QUICreator::updateCamera(QAction *action)
+//{
+//    QUICreator::setCamera(qvariant_cast<QCameraInfo>(action->data()));
+//}
 
 /*
  * @func: 设置当前摄像头
@@ -259,14 +259,6 @@ void QUICreator::faceDetectFinished(QVector<Student> res)
     for(auto r : res) {
         qDebug() << r.identifiable << r.id << "\t" << r.name << "\t" << r.major;
     }
-}
-
-void QUICreator::faceTrackFinishedWithoutResult()
-{
-}
-
-void QUICreator::faceDetectFinishedWithoutResult()
-{
 }
 
 

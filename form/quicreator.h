@@ -77,7 +77,7 @@ private slots:
     void doTrack();
 
     void setCamera(const QCameraInfo &camera_info);
-    void updateCamera(QAction *action);
+//    void updateCamera(QAction *action);
     void displayCameraError();
     void resetConsumption();
     void btnPayClicked();
@@ -89,8 +89,6 @@ private slots:
     // 处理face线程发出的信号
     void faceDetectFinished(QVector<Student> res);
     void faceTrackFinished(QVector<QRect> res);
-    void faceDetectFinishedWithoutResult();
-    void faceTrackFinishedWithoutResult();
 
     // 处理pose线程发出的信号
     void poseDetectFinished();
