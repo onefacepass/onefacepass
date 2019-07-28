@@ -37,7 +37,6 @@ private:
     int MAX_RESULT = 5;
     Ui::QUICreator *ui;
     QImage img_tmp;
-    QSettings *config;
 
     QScopedPointer<QCamera> camera;
     QScopedPointer<QCameraImageCapture> imageCapture;
@@ -51,8 +50,6 @@ private:
 private:
     void insertLog(const QString& log);
 
-    void checkConfig();
-
     // 打印摄像头支持的分辨率
     void debug_show_supported_viewfinder_resolutions();
 
@@ -65,13 +62,11 @@ private slots:
     void initForm();
     void initCamera();
     void initNav();
-//    void initAction();
     void initFaceAndPose();
     void initStudentWidget();
     void initOther();
 
     void setStyle(const QString &str);
-//    void takeImage();
     void processCapturedImage(int requestId, const QImage& img);
     void doDetect();
     void doTrack();

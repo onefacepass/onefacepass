@@ -11,9 +11,6 @@ QUICreator::QUICreator(QWidget *parent, const QString& config_file) :
 {
     ui->setupUi(this);
 
-    config = new QSettings(config_file, QSettings::IniFormat);
-
-    checkConfig();
     initForm();
 
     initCamera();
@@ -55,10 +52,10 @@ void QUICreator::initForm()
 void QUICreator::initFaceAndPose()
 {
 #ifdef DEBUG
-    insertLog("照片目录：" + QDir::toNativeSeparators(config->value("FaceDetect/preload").toString()));
+    insertLog("照片目录：" + QDir::toNativeSeparators(Config::GetPreloadPath()));
 #endif
     faceThread = FaceThread::Instance();
-    faceThread->SetPreloadPath(QDir::toNativeSeparators(config->value("FaceDetect/preload").toString()));
+    faceThread->SetPreloadPath(QDir::toNativeSeparators(Config::GetPreloadPath()));
 
     connect(faceThread, &FaceThread::DetectFinished, this, &QUICreator::faceDetectFinished);
     connect(faceThread, &FaceThread::TrackFinished, this, &QUICreator::faceTrackFinished);
@@ -425,20 +422,7 @@ void QUICreator::btnPayClicked()
     // takeImage();
 }
 
-void QUICreator::checkConfig()
-{
-    if (config->allKeys().size() == 0) {
-        QUIWidget::ShowMessageBoxErrorAndExit("配置文件初始化失败！");
-    } else if (!config->contains("FaceDetect/preload")) {
-        QUIWidget::ShowMessageBoxErrorAndExit("配置参数preload错误！");
-    }
-#ifdef DEBUG_CONFIG
-    insertLog("[CONFIG]");
-    foreach (auto key, config->allKeys()) {
-        insertLog(key + "=" + config->value(key).toString());
-    }
-#endif
-}
+
 
 
 /*********************************************************

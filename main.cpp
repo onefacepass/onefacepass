@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
     a.setFont(QFont("Microsoft Yahei", 9));
     a.setWindowIcon(QIcon(":/main.ico"));
 
+    Config::SetConfigFile(":/config.ini");
+    Config::checkConfig();
 
     QUIWidget::setCode();
     QUIWidget::setTranslator(":/image/qt_zh_CN.qm");
@@ -21,7 +23,7 @@ int main(int argc, char *argv[])
     AppInit::Instance()->start();
 
     QUIWidget qui;
-    QUICreator *creator = new QUICreator;
+    QUICreator *creator = new QUICreator();
 
 
     //设置主窗体

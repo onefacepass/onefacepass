@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     form/quicreator.cpp \
     form/appinit.cpp    \
     form/stuwidget.cpp \
-    form/posethread.cpp
+    form/posethread.cpp \
+    form/config.cpp
 
 
 
@@ -53,7 +54,8 @@ HEADERS  += head.h\
     form/quicreator.h \
     form/appinit.h  \
     form/stuwidget.h    \
-    form/posethread.h
+    form/posethread.h   \
+    form/config.h
 
 
 
