@@ -2,6 +2,8 @@
 #include <QtGui>
 #include <QtNetwork>
 
+#include "config.h"
+
 #if (QT_VERSION > QT_VERSION_CHECK(5,0,0))
 #include <QtWidgets>
 #endif
@@ -22,3 +24,4 @@
 #define AppPath qApp->applicationDirPath()
 #define AppDeskWidth qApp->desktop()->availableGeometry().width()
 #define AppDeskHeight qApp->desktop()->availableGeometry().height()
+
